@@ -396,19 +396,6 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# ✅ Step 1: Add HR-impact section placeholder at the bottom
-# --- HR Efficiency & Operational Impact ---
-st.markdown("---")
-st.markdown("## 🧠 Strategic Operational Impact (HR & Seasonal Savings)")
-st.markdown(
-    """
-    <div style='color: white; font-size: 15px; margin-top: -10px; margin-bottom: 20px;'>
-        These insights reflect cost avoidance and hidden savings from reduced churn, absenteeism, and seasonal volume strain.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
 if use_hr_impact:
     with st.sidebar.expander("Adjust HR Impact Assumptions"):
         hr_attrition = st.slider("Monthly Attrition Rate (%)", 0, 50, 10, key="bottom_attrition")
