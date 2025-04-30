@@ -245,17 +245,6 @@ with col3:
 with col4:
     st.markdown(metric_block("📈 ROI on Operating Cost (Annual)", annual_roi_percent, suffix="%"), unsafe_allow_html=True)
 
-# Indirect Impact
-st.markdown("## 🧩 Indirect Impact from AI (Performance Uplift)" )
-st.markdown(caption("These gains reflect enhanced output from improved efficiency and revenue uplift..."), unsafe_allow_html=True)
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.markdown(metric_block("🧠 Production Dollar Savings", production_dollar_savings, prefix="$"), unsafe_allow_html=True)
-with col2:
-    st.markdown(metric_block("🛒 Upsell Dollar Savings", upsell_dollar_savings, color="#1f77b4", border="#1f77b4", prefix="$"), unsafe_allow_html=True)
-with col3:
-    st.markdown(metric_block("🎯 Total Monthly Value", net_savings + indirect_savings, color="#FFD700", border="#FFD700", prefix="$"), unsafe_allow_html=True)
-
 # AI Investment Impact
 st.markdown("## 💡 AI Investment Impact")
 st.markdown(caption("Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."), unsafe_allow_html=True)
@@ -325,28 +314,6 @@ with col2:
         }
     ))
     st.plotly_chart(pay_fig, use_container_width=True)
-
-# Cost Comparison Waterfall
-st.markdown("## 💧 Monthly Cost Breakdown")
-st.markdown(
-    """
-    <div style='color: white; font-size: 15px; margin-top: -10px; margin-bottom: 20px;'>
-        This chart breaks down your full monthly cost transition from a 100% human-run operation 
-        to a partially automated AI-powered one. 
-        <br>It visualizes how labor is reduced, AI costs are added, and what the final AI-enabled 
-        operating cost looks like — so you can clearly see the shift in monthly spending.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-waterfall_fig = go.Figure(go.Waterfall(
-    measure=["absolute","relative","relative","relative","absolute"],
-    x=["100% Human Cost","- Reduced Labor","+ AI Usage","+ Subscription","Net AI-Enabled Cost"],
-    y=[baseline_human_cost, -residual_cost, ai_cost, subscription, ai_enabled_cost],
-    connector={'line':{'color':'rgb(63,63,63)'}}
-))
-waterfall_fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', yaxis_title='Monthly Cost ($)')
-st.plotly_chart(waterfall_fig, use_container_width=True)
 
 # Line Chart: Savings vs Integration Cost
 st.markdown("## 📈 Savings vs Integration Cost Over Time")
