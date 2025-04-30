@@ -303,12 +303,12 @@ with col2:
         # Also removed font size for responsive behavior
         title={'text': "Payback Period (Months)", 'font': {'color': 'white'}},
         gauge={
-            'axis': {'range': [0, 30]},
+            'axis': {'range': [0, 18]},
             'bar': {'color': "black"},
             'steps': [
                 {'range': [0, 7], 'color': "lightgreen"},
-                {'range': [7, 14], 'color': "yellow"},
-                {'range': [14, 30], 'color': "tomato"}
+                {'range': [7, 12], 'color': "yellow"},
+                {'range': [12, 18], 'color': "tomato"}
             ],
             'threshold': {'line': {'color': "red", 'width': 4}, 'value': 15}
         }
