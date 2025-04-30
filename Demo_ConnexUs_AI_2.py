@@ -396,41 +396,6 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-if use_hr_impact:
-    with st.sidebar.expander("Adjust HR Impact Assumptions"):
-        hr_attrition = st.slider("Monthly Attrition Rate (%)", 0, 50, 10, key="bottom_attrition")
-        hr_no_show = st.slider("No‑Call/No‑Show Rate (%)", 0, 20, 5, key="bottom_noshow")
-        hr_pto_days = st.slider("PTO/Sick‑Leave Days/Year", 0, 30, 5, key="bottom_pto")
-        hr_new_hire_cost = st.number_input("Cost per New Hire ($)", value=2000, step=500, key="bottom_hire_cost")
-        hr_peak_staffing = st.slider("Peak Volume Staffing Increase (%)", 0, 50, 10, key="bottom_peak_staffing")
-        hr_peak_frequency = st.slider("Peak Volume Occurrence (per year)", 0, 12, 3, key="bottom_peak_freq")
-else:
-    # Fallbacks if HR impact not used
-    hr_attrition = 0
-    hr_no_show = 0
-    hr_pto_days = 0
-    hr_new_hire_cost = 0
-    hr_peak_staffing = 0
-    hr_peak_frequency = 0
-
-# --- Strategic HR Placeholder Values (to prevent NameErrors if HR toggle is off) ---
-absentee_cost = 0
-seasonal_savings = 0
-recruiting_savings = 0
-
-# --- Strategic Value Calculations (Updated to Use Sidebar Inputs) ---
-if use_hr_impact:
-    total_annual_attrition = hr_attrition / 100 * effective_agents * 12
-    absence_rate = (hr_no_show / 100) + (hr_pto_days / 260)
-    recruiting_savings = total_annual_attrition * hr_new_hire_cost
-    seasonal_hours = (hr_peak_staffing / 100) * required_agents * shift_hours * hr_peak_frequency
-    seasonal_savings = seasonal_hours * hourly_cost * fully_loaded_multiplier
-    absentee_cost = absence_rate * base_labor_cost
-    strategic_total = recruiting_savings + absentee_cost + seasonal_savings
-    value_basis += strategic_total
-else:
-    strategic_total = 0
-
 # Make background of Plotly graphs transparent
 # This needs to be added wherever you define a chart layout, for example:
 # inv_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
