@@ -292,7 +292,7 @@ with col1:
         delta={'reference': 100},
         # Removed hardcoded font size for dynamic scaling
         title={'text': 'Investment ROI (%)', 'font': {'color': 'white'}},
-        gauge={'axis': {'range': [0, 200]}}
+        gauge={'axis': {'range': [0, 8000]}}
     ))
     st.plotly_chart(inv_fig, use_container_width=True)
 
