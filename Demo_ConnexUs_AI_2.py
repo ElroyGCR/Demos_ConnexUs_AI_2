@@ -142,6 +142,11 @@ hourly_cost     = st.sidebar.slider("Agent Hourly Cost ($)", 10.0, 60.0, 15.0)
 hours_per_week  = st.sidebar.slider("Weekly Hours per Agent", 35, 45, 40)
 shift_hours     = st.sidebar.number_input("Shift Length (hours)", value=8.5, step=0.5)
 
+# Business Impact Assumptions
+st.sidebar.subheader("💼 Business Impact Assumptions")
+production_percent = st.sidebar.number_input("Production Improvement (%)", value=25.0, step=0.1)
+upsell_percent     = st.sidebar.number_input("Upsell Improvement (%)", value=10.0, step=0.1)
+
 # AI Cost Inputs
 st.sidebar.markdown("---")
 st.sidebar.subheader("🤖 AI Cost Inputs")
