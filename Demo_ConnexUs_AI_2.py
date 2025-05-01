@@ -340,29 +340,6 @@ with col2:
     ))
     st.plotly_chart(pay_fig, use_container_width=True)
 
-# Line Chart: Savings vs Integration Cost
-st.markdown("## 📈 Savings vs Integration Cost Over Time")
-st.markdown(
-    """
-    <div style='color: white; font-size: 15px; margin-top: -10px; margin-bottom: 20px;'>
-        This chart compares cumulative monthly savings against your initial integration cost.
-        <br>The green line shows how your savings grow over time, while the dashed red line represents 
-        the one-time setup investment — giving you a clear visual of when ROI is achieved.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-df = pd.DataFrame({
-    'Month': list(range(1,13)),
-    'Cumulative Savings': [net_savings*m for m in range(1,13)],
-    'Integration Cost': [integration]*12
-})
-line_fig = go.Figure()
-line_fig.add_trace(go.Scatter(x=df['Month'], y=df['Cumulative Savings'], mode='lines+markers', name='Savings', line=dict(color='green')))
-line_fig.add_trace(go.Scatter(x=df['Month'], y=df['Integration Cost'], mode='lines', name='Integration Cost', line=dict(color='red', dash='dash')))
-line_fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', xaxis_title='Month', yaxis_title='Cumulative Savings ($)')
-st.plotly_chart(line_fig, use_container_width=True)
-
 # Donut Chart: AI Cost Composition
 st.markdown("## 🍩 AI Cost Composition")
 st.markdown(
