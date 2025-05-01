@@ -269,6 +269,22 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Monthly Cost Efficiency\st.markdown("### 💸 Monthly Cost Efficiency")
+st.markdown(f"""
+    <div style='
+        background-color: #111;
+        border: 2px solid #00FFAA;
+        border-radius: 12px;
+        padding: 15px;
+        width: fit-content;
+        margin-bottom: 25px;
+    '>
+        <div style='color: #00FFAA; font-size: 36px; font-weight: bold;'>
+            {(net_savings / baseline_human_cost * 100):.2f}%
+        </div>
+    </div>
+""", unsafe_allow_html=True)
+
 # ROI & Break-even (Investment)
 st.markdown("## 💼 ROI & Break-even Based on Investment")
 st.markdown(
@@ -380,21 +396,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-# Monthly Cost Efficiency\st.markdown("### 💸 Monthly Cost Efficiency")
-st.markdown(f"""
-    <div style='
-        background-color: #111;
-        border: 2px solid #00FFAA;
-        border-radius: 12px;
-        padding: 15px;
-        width: fit-content;
-        margin-bottom: 25px;
-    '>
-        <div style='color: #00FFAA; font-size: 36px; font-weight: bold;'>
-            {(net_savings / baseline_human_cost * 100):.2f}%
-        </div>
-    </div>
-""", unsafe_allow_html=True)
+
 
 # Make background of Plotly graphs transparent
 # This needs to be added wherever you define a chart layout, for example:
