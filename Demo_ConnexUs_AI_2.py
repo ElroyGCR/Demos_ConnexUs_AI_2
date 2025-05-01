@@ -374,7 +374,45 @@ donut_fig.update_layout(
 
 st.plotly_chart(donut_fig, use_container_width=True)
 
+# --- 10. Cost Breakdown with Collapsible Details ---
+st.markdown("## 🔍 Cost Breakdown Details")
+st.markdown(f"""
+<details>
+  <summary><strong>Human Agent Cost: ${baseline_human_cost:,.0f}</strong></summary>
+  <ul>
+    <li>Total Monthly Hours: {agent_monthly_hours:.0f}</li>
+    <li>Hourly Total: ${(agent_monthly_hours * hourly_cost):,.0f}</li>
+    <li>Tax & Benefits: ${(agent_monthly_hours * hourly_cost * (fully_loaded_multiplier - 1)):, .0f}</li>
+    <li>Talk Utilization: { (weekly_interactions * aht * 4.33) / (agent_monthly_hours * agents) * 100:.0f}%</li>
+  </ul>
+</details>
 
+<details>
+  <summary><strong>AI Agent Cost: ${ai_enabled_cost:,.0f}</strong></summary>
+  <ul>
+    <li>Total Monthly Minutes Automated: {ai_minutes:,.0f}</li>
+    <li>AI Usage Cost: ${ai_cost:,.0f}</li>
+    <li>Subscription Fee: ${subscription:,.0f}</li>
+    <li>Residual Human Cost: ${residual_cost:,.0f}</li>
+  </ul>
+</details>
+""", unsafe_allow_html=True)
+
+# --- 11. FAQ Accordion ---
+st.markdown("## ❓ Frequently Asked Questions")
+faq = {
+    "How does AI reduce payroll costs?": "AI replaces salaries, benefits, and overtime pay associated with human agents.",
+    "What kind of cost savings can I expect?": "On average, businesses save up to 50% on communication costs by switching to AI.",
+    "Will I save on training expenses?": "AI agents require no onboarding or upskilling, eliminating training budgets.",
+    "Can I scale without extra headcount?": "Yes—AI scales on demand with minimal incremental cost."
+}
+for question, answer in faq.items():
+    st.markdown(f"""
+<details>
+  <summary>{question}</summary>
+  <p>{answer}</p>
+</details>
+""", unsafe_allow_html=True)
 # Make background of Plotly graphs transparent
 # This needs to be added wherever you define a chart layout, for example:
 # inv_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
