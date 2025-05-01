@@ -269,6 +269,16 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+st.markdown("## 💸 Monthly Cost Efficiency")
+st.markdown(
+    """
+    <div style='color: white; font-size: 15px; margin-top: -10px; margin-bottom: 15px;'>
+        This shows how much your monthly costs drop compared to a fully human-run operation.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 # Monthly Cost Efficiency\st.markdown("### 💸 Monthly Cost Efficiency")
 st.markdown(f"""
     <div style='
@@ -386,16 +396,6 @@ donut_fig.update_layout(
 )
 
 st.plotly_chart(donut_fig, use_container_width=True)
-
-st.markdown("## 💸 Monthly Cost Efficiency")
-st.markdown(
-    """
-    <div style='color: white; font-size: 15px; margin-top: -10px; margin-bottom: 15px;'>
-        This shows how much your monthly costs drop compared to a fully human-run operation.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
 
 # Make background of Plotly graphs transparent
