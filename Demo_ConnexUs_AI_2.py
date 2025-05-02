@@ -413,4 +413,3 @@ for question, answer in faq.items():
   <p>{answer}</p>
 </details>
 """, unsafe_allow_html=True)
-```
