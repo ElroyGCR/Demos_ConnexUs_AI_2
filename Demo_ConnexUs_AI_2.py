@@ -1,49 +1,30 @@
 import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
 from PIL import Image
 from io import BytesIO
 import base64
+import plotly.graph_objects as go
 
 # --- Page Setup ---
-st.set_page_config(page_title="ConnexUs.AI Calculator", page_icon="favicon-32x32.png", layout="wide")
+st.set_page_config(page_title="ConnexUS AI ROI Calculator",
+                   page_icon="favicon-32x32.png",
+                   layout="wide")
 
-# --- Favicon Injection (Base64 Embedded) ---
+# --- Favicon Injection ---
 def load_favicon_base64(path="favicon-32x32.png"):
     try:
         img = Image.open(path)
         buffer = BytesIO()
         img.save(buffer, format="PNG")
         return base64.b64encode(buffer.getvalue()).decode("utf-8")
-    except Exception:
+    except:
         return None
 
 favicon_b64 = load_favicon_base64()
 if favicon_b64:
-    st.markdown(
-        f"""
-        <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,{favicon_b64}">
-        """,
-        unsafe_allow_html=True
-    )
-
-# --- Theme-safe Global Styling ---
-st.markdown(
-    """
-    <style>
-    .block-container {
-        padding-top: 0rem !important;
-    }
-    @media (max-width: 768px) {
-        .block-container {
-            padding-left: 0.5rem !important;
-            padding-right: 0.5rem !important;
-        }
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+    st.markdown(f"""
+        <link rel="icon" type="image/png" sizes="32x32"
+              href="data:image/png;base64,{favicon_b64}">
+    """, unsafe_allow_html=True)
 
 # --- Watermark Setup ---
 def load_watermark_base64(path="connexus_logo_watermark.png"):
@@ -58,358 +39,269 @@ def load_watermark_base64(path="connexus_logo_watermark.png"):
 
 watermark_b64 = load_watermark_base64()
 if watermark_b64:
-    st.markdown(
-        f"""
+    st.markdown(f"""
         <style>
         .watermark {{
             position: fixed;
             top: 80px;
-            left: calc(540px + 30%);
+            left: 50%;
             transform: translateX(-50%);
+            width: 800px;
             height: 800px;
-            width: 850px;
-            z-index: 0;
-            pointer-events: none;
-            background-image: url("data:image/png;base64,{watermark_b64}");
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: contain;
             opacity: 0.15;
+            pointer-events: none;
+            background: url("data:image/png;base64,{watermark_b64}") no-repeat
+                        center center / contain;
+            z-index: 0;
         }}
         </style>
         <div class="watermark"></div>
-        """,
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
+
+# --- Styles & Utilities ---
+TRANSPARENT_LAYOUT = dict(
+    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)'
+)
+
+def metric_block(label, value, icon=None, color="#00FFAA", border="#00FFAA",
+                 prefix="", suffix=""):
+    icon_html = (f"<img src='{icon}' width='16' "
+                 "style='vertical-align:middle; margin-right:6px;'/>") if icon else ""
+    return f"""
+    <div style='
+        display:inline-block;
+        background-color: rgba(17,17,17,0.8);
+        border: 2px solid {border};
+        border-radius: 12px;
+        padding: 12px 20px;
+        margin: 5px;
+        z-index:1;
+    '>
+      <div style='color:#EEE; font-size:14px; margin-bottom:4px;'>
+        {icon_html}{label}
+      </div>
+      <div style='color:{color}; font-size:32px; font-weight:600;'>
+        {prefix}{value:,.1f}{suffix}
+      </div>
+    </div>
+    """
+
+def small_metric_card(label, value, prefix="", suffix=""):
+    return f"""
+    <div style='
+        display:inline-block;
+        background-color: rgba(17,17,17,0.8);
+        border: 1px solid #00FFAA;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin: 3px;
+        text-align:center;
+        z-index:1;
+    '>
+      <div style='color:#AAA; font-size:11px; margin-bottom:3px;'>{label}</div>
+      <div style='color:#00FFAA; font-size:18px; font-weight:600;'>
+        {prefix}{value:,.1f}{suffix}
+      </div>
+    </div>
+    """
+
+def caption(text):
+    return f"<div style='color:#DDD; font-size:14px; margin-bottom:8px;'>{text}</div>"
 
 # --- Title ---
 st.markdown("""
-    <div style='padding-top: 0rem;'>
-        <h1 style='font-size: 2.4rem; font-weight: 800; margin-bottom: 1.5rem;'>ConnexUS AI ROI Calculator</h1>
-        <hr style='margin-top: -1rem; margin-bottom: 1rem;'>
-    </div>
+    <h1 style='color:white; font-size:2.4rem; font-weight:800;
+               margin-bottom:0.2rem; z-index:1;'>
+      ConnexUS AI ROI Calculator
+    </h1>
+    <hr style='border-top:1px solid #333; margin-bottom:1rem;'>
 """, unsafe_allow_html=True)
 
-# Make background of Plotly graphs transparent
-# This needs to be added wherever you define a chart layout:
-# Example:
-# fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-
-# Global layout setting for all Plotly charts
-TRANSPARENT_LAYOUT = dict(
-    paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)'
-)
-
-# Now whenever you create a figure:
-# fig.update_layout(**TRANSPARENT_LAYOUT)
-
-def metric_block(label, value, color="#00FFAA", border="#00FFAA", prefix="", suffix=""):
-    return f"""
-    <div style='
-        background-color: #111;
-        border: 2px solid {border};
-        border-radius: 12px;
-        padding: 15px;
-        width: fit-content;
-        margin-bottom: 25px;
-    '>
-        <div style='color: white; font-size: 16px; margin-bottom: 5px;'>{label}</div>
-        <div style='color: {color}; font-size: 36px; font-weight: bold;'>{prefix}{value:,.1f}{suffix}</div>
-    </div>
-    """
-    
-def caption(text):
-    return f"<div style='color: white; font-size: 15px; margin-bottom: 10px;'>{text}</div>"
-
-# Load logo
-logo = Image.open("connexus_logo.png")
-
 # --- SIDEBAR INPUTS ---
-st.sidebar.image(logo, use_container_width=True)
 st.sidebar.header("📊 Input Your Call Center Data")
 
 # Revenue & Volume
 st.sidebar.subheader("📈 Revenue & Volume")
-monthly_revenue   = st.sidebar.number_input("Monthly Revenue ($)", value=250000, step=10000)
-weekly_interactions = st.sidebar.number_input("Weekly Interactions", value=10000, step=100)
-aht             = st.sidebar.slider("Average Handle Time (minutes)", 1, 20, 6)
+monthly_revenue    = st.sidebar.number_input("Monthly Revenue ($)", value=250_000, step=10_000)
+weekly_interactions= st.sidebar.number_input("Weekly Interactions", value=10_000, step=100)
+aht                = st.sidebar.slider("Average Handle Time (minutes)", 1, 20, 6)
 
 # Workforce & Agent Metrics
 st.sidebar.subheader("👥 Workforce & Agent Metrics")
-agents          = st.sidebar.slider("Agents (FTE)", 1, 100, 25)
-hourly_cost     = st.sidebar.slider("Agent Hourly Cost ($)", 10.0, 60.0, 15.0)
-hours_per_week  = st.sidebar.slider("Weekly Hours per Agent", 35, 45, 40)
-shift_hours     = st.sidebar.number_input("Shift Length (hours)", value=8.5, step=0.5)
+agents             = st.sidebar.number_input("Agents (FTE)", value=25, min_value=1)
+hourly_cost        = st.sidebar.number_input("Agent Hourly Cost ($)", value=12.0, min_value=5.0, max_value=50.0)
+burden_pct         = st.sidebar.slider("Burden % (Taxes & Benefits)", 0, 75, 35, step=5)
+talk_pct           = st.sidebar.slider("Talk Utilization %", 0, 100, 40, step=5)
+hours_per_month    = st.sidebar.number_input("Hours per Agent / Month", value=40*4.33)
 
 # Business Impact Assumptions
 st.sidebar.subheader("💼 Business Impact Assumptions")
-production_percent = st.sidebar.number_input("Production Improvement (%)", value=25.0, step=0.1)
-upsell_percent     = st.sidebar.number_input("Upsell Improvement (%)", value=10.0, step=0.1)
+production_pct     = st.sidebar.number_input("Production Improvement (%)", value=25.0, step=0.1)
+upsell_pct         = st.sidebar.number_input("Upsell Improvement (%)",    value=10.0, step=0.1)
 
 # AI Cost Inputs
-st.sidebar.markdown("---")
 st.sidebar.subheader("🤖 AI Cost Inputs")
-automation       = st.sidebar.slider("AI Automation % Target", 0, 100, 50)
-subscription      = st.sidebar.number_input("AI Monthly Subscription ($)", value=2000, step=100)
-integration       = st.sidebar.number_input("One-time Integration Fee ($)", value=15000, step=1000)
-ai_cost_per_min  = st.sidebar.number_input("AI Cost per Minute ($)", value=0.18, step=0.01)
+subscription       = st.sidebar.number_input("AI Subscription ($/mo)", value=2_000, step=100)
+integration_fee    = st.sidebar.number_input("Integration Fee ($)",     value=15_000, step=500)
+ai_cost_per_min    = st.sidebar.number_input("AI Cost per Minute ($)", value=0.20, step=0.01)
+automation_pct     = st.sidebar.slider("Automation % Target", 0, 100, 50, step=5)
 
-# ROI Calculation Toggles
-st.sidebar.markdown("---")
-use_indirects    = st.sidebar.checkbox("Include Indirect Value in ROI Calculation", value=True)
+# ROI Toggles
+st.sidebar.subheader("⚙️ ROI Options")
+use_indirects      = st.sidebar.checkbox("Include Indirect Value", value=True)
+include_strategic  = st.sidebar.checkbox("Include Strategic HR Savings", value=False)
+strategic_pct      = st.sidebar.slider("Strategic HR Savings (%)",
+                                       0, 50, 25, step=5) if include_strategic else 0
 
-# --- MAIN LAYOUT ---
-st.markdown("<hr style='margin-top: -1rem; margin-bottom: 1rem;'>", unsafe_allow_html=True)
+# --- CALCULATIONS ---
 
-# --- 1. Total Monthly Workload ---
-monthly_minutes = weekly_interactions * aht * 4.33
+# 1. Total Monthly Workload
+monthly_minutes    = weekly_interactions * aht * 4.33
 
-# --- 2. AI vs Residual Human Cost ---
-ai_minutes       = (automation / 100) * monthly_minutes
-residual_minutes = monthly_minutes - ai_minutes
+# 2. AI vs Residual Human Cost
+ai_minutes         = (automation_pct/100) * monthly_minutes
+residual_minutes   = monthly_minutes - ai_minutes
 
-# AI spend
-ai_cost         = ai_minutes * ai_cost_per_min
+ai_cost            = ai_minutes * ai_cost_per_min
+fully_loaded_mul   = 1 + (burden_pct/100)
+residual_cost      = (residual_minutes/60) * hourly_cost * fully_loaded_mul
 
-# Residual human labor after automation, with fully-loaded multiplier
-fully_loaded_multiplier = 1.222431
-residual_cost    = (residual_minutes / 60) * hourly_cost * fully_loaded_multiplier
+subscription_cost  = subscription
+total_ai_spend     = ai_cost + subscription_cost
+ai_enabled_cost    = ai_cost + residual_cost + subscription_cost
 
-ai_enabled_cost      = ai_cost + residual_cost + subscription
-# Cost excluding residual labor (pure AI spend + subscription)
-total_ai_monthly_cost  = ai_cost + subscription
+# 3. Indirect Savings (Production & Upsell)
+production_savings = (monthly_minutes*(production_pct/100)/60) \
+                     * hourly_cost * fully_loaded_mul
+upsell_savings     = monthly_revenue * (upsell_pct/100)
+indirect_savings   = production_savings + upsell_savings
 
-# --- 3. Indirect Value (Production & Upsell) ---
-production_multiplier = production_percent / 100
-upsell_multiplier     = upsell_percent / 100
-
-# Convert saved minutes to dollar savings for production
-production_minutes_saved = monthly_minutes * production_multiplier
-production_hours_saved   = production_minutes_saved / 60
-production_dollar_savings = production_hours_saved * hourly_cost * fully_loaded_multiplier
-
-# Upsell tied to incremental revenue lift\_dollar_savings = monthly_revenue * upsell_multiplier
-upsell_dollar_savings   = monthly_revenue * upsell_multiplier
-
-# Total indirect savings in $ 
-indirect_savings = production_dollar_savings + upsell_dollar_savings
-
-total_monthly_value = (ai_enabled_cost := ai_enabled_cost)  # to preserve ai_enabled_cost name
-net_savings           = None  # placeholder below
-
-# --- 4. Baseline Human Cost Calculation ---
-agent_monthly_hours = hours_per_week * 4.33
-minutes_per_agent   = agent_monthly_hours * 60
-required_agents     = monthly_minutes / minutes_per_agent
+# 4. Baseline Human Cost
+agent_monthly_hours= hours_per_month
+minutes_per_agent  = agent_monthly_hours * 60
+required_agents    = monthly_minutes / minutes_per_agent
 effective_agents   = max(agents, required_agents)
 
-base_labor_cost     = effective_agents * agent_monthly_hours * hourly_cost
-baseline_human_cost = base_labor_cost * fully_loaded_multiplier
+baseline_human_cost= (
+    effective_agents
+  * agent_monthly_hours
+  * hourly_cost
+  * fully_loaded_mul
+)
 
-# --- 5. Net Direct Savings ---
-net_savings         = baseline_human_cost - ai_enabled_cost
+# 5. Net Direct Savings
+net_savings        = baseline_human_cost - ai_enabled_cost
 
-# --- 6. ROI Value Basis (Direct + Optional Indirect + HR) ---
-value_basis = net_savings
+# 6. Strategic HR Savings
+strategic_savings  = net_savings * (strategic_pct/100)
+
+# 7. Total Value Basis
+value_basis        = net_savings
 if use_indirects:
-    value_basis += indirect_savings
+    value_basis   += indirect_savings
+if include_strategic:
+    value_basis   += strategic_savings
 
-# Placeholder for strategic (HR) impact; will be added later if toggled
-strategic_total = 0
+# 8. ROI & Payback (Operating)
+roi_monthly        = (value_basis / ai_enabled_cost) * 100 if ai_enabled_cost else 0
+annual_roi         = roi_monthly * 12
+payback_days       = (integration_fee / value_basis) * 30 if value_basis else float('inf')
 
-# --- 7. ROI & Payback on Operating Cost ---
-roi_percent          = (value_basis / ai_enabled_cost) * 100 if ai_enabled_cost > 0 else 0
-annual_roi_percent   = roi_percent * 12
-payback_days         = (integration / value_basis) * 30 if value_basis > 0 else float('inf')
+# 9. ROI & Payback (Integration)
+integration_roi    = (value_basis / integration_fee) * 100 if integration_fee else 0
+integration_payback= integration_fee / value_basis if value_basis else float('inf')
 
-# --- 8. ROI vs Investment (Integration) ---
-annual_net_savings    = total_monthly_value * 12
-investment_roi       = ((annual_net_savings - integration) / integration) * 100 if integration > 0 else 0
-investment_payback_months = (integration / annual_net_savings) * 12 if annual_net_savings > 0 else float('inf')
+# 10. Cost Efficiency & Savings per Dollar
+cost_efficiency    = ((baseline_human_cost - ai_enabled_cost)
+                     / baseline_human_cost) * 100 if baseline_human_cost else 0
+dollar_saved_per_dollar = (value_basis / total_ai_spend
+                           if total_ai_spend else 0)
 
-dollar_saved_per_ai_dollar = (value_basis / total_ai_monthly_cost) if total_ai_monthly_cost > 0 else 0
+# --- UI OUTPUTS ---
 
-# --- 9. Build the Streamlit UI ---
-# Core Financial Metrics
 st.markdown("## 📊 Core Financial Metrics (Operating Basis)")
-st.markdown(caption("These values reflect cost savings compared to your human-only baseline."), unsafe_allow_html=True)
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.markdown(metric_block("💰 Net Monthly Savings", net_savings, prefix="$"), unsafe_allow_html=True)
-with col2:
-    st.markdown(metric_block("🧾 Break-even Period", payback_days, suffix=" days"), unsafe_allow_html=True)
-with col3:
-    st.markdown(metric_block("📈 ROI on Operating Cost (Monthly)", roi_percent, suffix="%"), unsafe_allow_html=True)
-with col4:
-    st.markdown(metric_block("📈 ROI on Operating Cost (Annual)", annual_roi_percent, suffix="%"), unsafe_allow_html=True)
+st.markdown(caption("These values reflect cost savings vs. a fully human‐run operation."))
+c1,c2,c3,c4 = st.columns(4)
+with c1:
+    st.markdown(metric_block("Net Savings",       net_savings,
+                             icon="favicon-16x16.png", prefix="$"), unsafe_allow_html=True)
+with c2:
+    st.markdown(metric_block("Cost Eff.",         cost_efficiency,
+                             icon="favicon-16x16.png", suffix="%"), unsafe_allow_html=True)
+with c3:
+    st.markdown(metric_block("ROI (Mo)",          roi_monthly,
+                             icon="favicon-16x16.png", suffix="%"), unsafe_allow_html=True)
+with c4:
+    st.markdown(metric_block("Payback (mo)",      integration_payback,
+                             icon="favicon-16x16.png", suffix=" mo"), unsafe_allow_html=True)
 
-# AI Investment Impact
-st.markdown("## 💡 AI Investment Impact")
-st.markdown(caption("Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."), unsafe_allow_html=True)
-
+st.markdown("---")
+st.markdown("## 🚀 AI Investment Impact")
+st.markdown(caption("Value returned for every \$1 spent on AI usage + subscription."))
 st.markdown(
-    f"""
-    <div style='
-        background-color: #111;
-        border: 2px solid #00FFAA;
-        border-radius: 12px;
-        padding: 20px 30px;
-        margin-top: 10px;
-        margin-bottom: 20px;
-        font-size: 30px;
-        font-weight: 500;
-        color: white;
-        text-align: center;
-    '>
-        For every <span style='color:#FFD700; font-size: 46px; font-weight:800;'>$1</span> you invest in AI, you save:
-        <span style='color:#00FFAA; font-size: 50px; font-weight:900;'>${dollar_saved_per_ai_dollar:,.2f}</span>
-    </div>
-    """,
+    metric_block("$1 spent →", dollar_saved_per_dollar,
+                 icon="favicon-32x32.png", prefix="$"),
     unsafe_allow_html=True
 )
 
-st.markdown("## 💸 Monthly Cost Efficiency")
-st.markdown(
-    """
-    <div style='color: white; font-size: 15px; margin-top: -10px; margin-bottom: 15px;'>
-        This shows how much your monthly costs drop compared to a fully human-run operation.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("---")
+st.markdown("## 💼 Key Metrics (Integration Basis)")
+st.markdown(caption("Returns compared to your one-time integration fee."))
+i1,i2,i3,i4 = st.columns(4)
+with i1:
+    st.markdown(metric_block("ROI (Mo)",   integration_roi,
+                             icon="favicon-16x16.png", suffix="%"), unsafe_allow_html=True)
+with i2:
+    st.markdown(metric_block("Annual ROI", integration_roi*12,
+                             icon="favicon-16x16.png", suffix="%"), unsafe_allow_html=True)
+with i3:
+    st.markdown(metric_block("Payback",    integration_payback,
+                             icon="favicon-16x16.png", suffix=" mo"), unsafe_allow_html=True)
+with i4:
+    st.markdown(metric_block("Total Value", value_basis,
+                             icon="favicon-16x16.png", prefix="$"), unsafe_allow_html=True)
 
-# Monthly Cost Efficiency\st.markdown("### 💸 Monthly Cost Efficiency")
-st.markdown(f"""
-    <div style='
-        background-color: #111;
-        border: 2px solid #00FFAA;
-        border-radius: 12px;
-        padding: 15px;
-        width: fit-content;
-        margin-bottom: 25px;
-    '>
-        <div style='color: #00FFAA; font-size: 36px; font-weight: bold;'>
-            {(net_savings / baseline_human_cost * 100):.2f}%
-        </div>
-    </div>
-""", unsafe_allow_html=True)
-
-# ROI & Break-even (Investment)
-st.markdown("## 💼 ROI & Break-even Based on Investment")
-st.markdown(
-    """
-    <div style='color: white; font-size: 15px; margin-top: -10px; margin-bottom: 20px;'>
-        This section measures ROI compared to your up‑front investment (integration cost).<br>
-        <strong>Investment ROI (%)</strong> calculates your return over the course of a year.<br>
-        <strong>Payback Period (Months)</strong> estimates how many months it takes to recoup initial setup costs.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    inv_fig = go.Figure(go.Indicator(
-        mode="gauge+number+delta",
-        value=investment_roi,
-        delta={'reference': 100},
-        # Removed hardcoded font size for dynamic scaling
-        title={'text': 'Investment ROI (%)', 'font': {'color': 'white'}},
-        gauge={'axis': {'range': [0, 8000]}}
-    ))
-    st.plotly_chart(inv_fig, use_container_width=True)
-
-with col2:
-    pay_fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=investment_payback_months,
-        # Also removed font size for responsive behavior
-        title={'text': "Payback Period (Months)", 'font': {'color': 'white'}},
-        gauge={
-            'axis': {'range': [0, 18]},
-            'bar': {'color': "black"},
-            'steps': [
-                {'range': [0, 7], 'color': "lightgreen"},
-                {'range': [7, 12], 'color': "yellow"},
-                {'range': [12, 18], 'color': "tomato"}
-            ],
-            'threshold': {'line': {'color': "red", 'width': 4}, 'value': 15}
-        }
-    ))
-    st.plotly_chart(pay_fig, use_container_width=True)
-
-# Donut Chart: AI Cost Composition
+st.markdown("---")
 st.markdown("## 🍩 AI Cost Composition")
-st.markdown(
-    """
-    <div style='color: white; font-size: 15px; margin-top: -10px; margin-bottom: 20px;'>
-        This chart visualizes the composition of your AI-enabled monthly operating cost.
-        <br>It breaks down how much is spent on AI usage, remaining labor, and platform subscription —
-        helping you see where your new cost structure lies.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-donut_fig = go.Figure(data=[go.Pie(
-    labels=["AI Usage", "Residual Labor", "Subscription"],
-    values=[ai_cost, residual_cost, subscription],
-    hole=0.5,
-    textinfo="label+percent+value",
-    textfont=dict(size=18),  # Match HR donut
-    marker=dict(colors=["#1f77b4", "#aec7e8", "#ff9896"])  # Optional: set consistent colors
+st.markdown(caption("AI usage vs. residual labor vs. subscription"))
+pie = go.Figure(data=[go.Pie(
+    labels=["AI Usage","Residual Labor","Subscription"],
+    values=[ai_cost, residual_cost, subscription_cost],
+    hole=0.5,textinfo="label+percent",
 )])
+pie.update_layout(**TRANSPARENT_LAYOUT, showlegend=True)
+st.plotly_chart(pie, use_container_width=True)
 
-donut_fig.update_layout(
-    height=550,
-    showlegend=True,
-    title="AI-Enabled Monthly Cost Breakdown",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(size=16),
-    legend=dict(font=dict(size=22)),  # Match other donut
-    margin=dict(t=40, b=40, l=60, r=60)
+# --- Savings Over Time Plot ---
+def plot_savings_over_time(net, net_ind=None, all_val=None):
+    months = [1,6,12,18,24,36,48,60]
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        name="Net Saving", x=months,
+        y=[net*m for m in months],
+        mode="lines+markers"
+    ))
+    if net_ind is not None:
+        fig.add_trace(go.Scatter(
+            name="Net+Indirect", x=months,
+            y=[(net+indirect_savings)*m for m in months],
+            mode="lines+markers"
+        ))
+    if all_val is not None:
+        fig.add_trace(go.Scatter(
+            name="All Savings", x=months,
+            y=[all_val*m for m in months],
+            mode="lines+markers"
+        ))
+    fig.update_layout(
+        title="Cumulative Savings Over Time",
+        xaxis_title="Months", yaxis_title="Savings ($)",
+        **TRANSPARENT_LAYOUT
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+plot_savings_over_time(
+    net_savings,
+    net_savings+indirect_savings if use_indirects else None,
+    value_basis if include_strategic else None
 )
-
-st.plotly_chart(donut_fig, use_container_width=True)
-
-# --- 10. Cost Breakdown with Collapsible Details ---
-st.markdown("## 🔍 Cost Breakdown Details")
-st.markdown(f"""
-<details>
-  <summary><strong>Human Agent Cost: ${baseline_human_cost:,.0f}</strong></summary>
-  <ul>
-    <li>Total Monthly Hours: {agent_monthly_hours:.0f}</li>
-    <li>Hourly Total: ${(agent_monthly_hours * hourly_cost):,.0f}</li>
-    <li>Tax & Benefits: ${(agent_monthly_hours * hourly_cost * (fully_loaded_multiplier - 1)):,.0f}</li>
-    <li>Talk Utilization: {(monthly_minutes / (agent_monthly_hours * 60 * agents) * 100):.0f}%</li>
-  </ul>
-</details>
-
-<details>
-  <summary><strong>AI Agent Cost: ${ai_enabled_cost:,.0f}</strong></summary>
-  <ul>
-    <li>Total Monthly Minutes Automated: {ai_minutes:,.0f}</li>
-    <li>AI Usage Cost: ${ai_cost:,.0f}</li>
-    <li>Subscription Fee: ${subscription:,.0f}</li>
-    <li>Residual Human Cost: ${residual_cost:,.0f}</li>
-  </ul>
-</details>
-""", unsafe_allow_html=True)
-
-# --- 11. FAQ Accordion ---
-st.markdown("## ❓ Frequently Asked Questions")
-faq = {
-    "How does AI reduce payroll costs?": "AI replaces salaries, benefits, and overtime pay associated with human agents.",
-    "What kind of cost savings can I expect?": "On average, businesses save up to 50% on communication costs by switching to AI.",
-    "Will I save on training expenses?": "AI agents require no onboarding or upskilling, eliminating training budgets.",
-    "Can I scale without extra headcount?": "Yes—AI scales on demand with minimal incremental cost."
-}
-for question, answer in faq.items():
-    st.markdown(f"""
-<details>
-  <summary>{question}</summary>
-  <p>{answer}</p>
-</details>
-""", unsafe_allow_html=True)
