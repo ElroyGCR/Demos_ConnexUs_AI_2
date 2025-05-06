@@ -185,6 +185,61 @@ with i3:
 with i4:
     st.markdown(metric_block("Total Value (Combined)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 
+# Add toggle for detailed explanation of the metrics
+with st.expander("ℹ️ How are these metrics calculated?"):
+    st.markdown(f"""
+    <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+        <h4 style="color: #00FFAA; margin-top: 0;">Direct Savings Metrics</h4>
+        <p><strong>Net Monthly Savings (${net_savings:,.0f})</strong>: The total monthly cost reduction achieved by implementing AI.</p>
+        <ul>
+            <li>Calculated as: Baseline human cost minus AI-enabled cost</li>
+            <li>Formula: <code>agents × hours × rate × burden_multiplier - (residual_human_cost + ai_variable_cost + subscription)</code></li>
+        </ul>
+        
+        <p><strong>Monthly Cost Efficiency ({monthly_cost_efficiency:.1f}%)</strong>: The percentage of baseline costs saved through AI implementation.</p>
+        <ul>
+            <li>Formula: <code>(net_savings / baseline_human_cost) × 100</code></li>
+        </ul>
+    </div>
+
+    <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+        <h4 style="color: #00FFAA; margin-top: 0;">ROI Metrics</h4>
+        <p><strong>ROI on Production ({roi_prod_mo:.1f}% monthly, {roi_prod_mo*12:.1f}% yearly)</strong>: Return on investment relative to your baseline operational costs.</p>
+        <ul>
+            <li>Shows how much value is returned for every dollar of your current operations</li>
+            <li>Formula: <code>(total_value / baseline_human_cost) × 100</code></li>
+        </ul>
+        
+        <p><strong>ROI on Integration ({roi_integ_mo:.1f}% monthly, {roi_integ_yr:.1f}% yearly)</strong>: Return on investment relative to your upfront integration costs.</p>
+        <ul>
+            <li>Shows how quickly you'll recover the initial integration fee</li>
+            <li>Formula: <code>(total_value / integration_fee) × 100</code></li>
+        </ul>
+    </div>
+
+    <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+        <h4 style="color: #00FFAA; margin-top: 0;">Payback Metrics</h4>
+        <p><strong>Payback on Production ({payback_mo_prod:.2f} months)</strong>: Number of months required to recover your baseline operational costs.</p>
+        <ul>
+            <li>Formula: <code>baseline_human_cost / total_value</code></li>
+        </ul>
+        
+        <p><strong>Payback on Integration ({payback_mo_integ:.2f} months)</strong>: Number of months required to recover your integration investment.</p>
+        <ul>
+            <li>Formula: <code>integration_fee / total_value</code></li>
+        </ul>
+    </div>
+
+    <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px;">
+        <h4 style="color: #00FFAA; margin-top: 0;">Total Value</h4>
+        <p><strong>Total Value (Combined) (${value_basis:,.0f})</strong>: The combined total of all direct and indirect savings.</p>
+        <ul>
+            <li>Formula: <code>net_savings + indirect_savings + strategic_savings</code></li>
+            <li>This represents the total financial impact of implementing AI</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
 st.markdown("---")
 
 # Add explanatory text for Indirect Impact section
@@ -203,6 +258,34 @@ if include_indirect:
     if include_hr:
         with indirect_col2:
             st.markdown(metric_block("HR Strategic Impact", strategic_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    
+    # Add toggle for detailed explanation of indirect savings
+    with st.expander("ℹ️ How are these indirect benefits calculated?"):
+        st.markdown(f"""
+        <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+            <h4 style="color: #00FFAA; margin-top: 0;">Indirect Savings (${indirect_savings:,.0f})</h4>
+            <p>These savings come from the reduction in unproductive time, enhanced by AI's 24/7 operational advantage.</p>
+            <ul>
+                <li><strong>Unproductive cost</strong>: The portion of your baseline cost that doesn't generate direct value ({100-talk_pct}% of total)</li>
+                <li><strong>AI efficiency factor</strong>: A multiplier ({ai_efficiency_factor:.1f}x) that reflects AI's ability to work continuously</li>
+                <li><strong>Formula</strong>: <code>unproductive_cost × (automation_pct/100) × ai_efficiency_factor</code></li>
+                <li>This represents productivity gains, reduced training costs, and lower overhead</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if include_hr:
+            st.markdown(f"""
+            <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px;">
+                <h4 style="color: #00FFAA; margin-top: 0;">HR Strategic Impact (${strategic_savings:,.0f})</h4>
+                <p>These are higher-order benefits from improved HR operations and strategic workforce planning.</p>
+                <ul>
+                    <li>Calculated as {hr_pct}% of the indirect savings</li>
+                    <li><strong>Formula</strong>: <code>indirect_savings × (hr_pct/100)</code></li>
+                    <li>Represents reduced turnover, better hiring outcomes, and improved agent experience</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
     
     st.markdown("---")
 
@@ -238,6 +321,22 @@ st.markdown(f"""
     <span style="color:#00FFAA; font-size:50px; font-weight:900;">${dollar_return:,.2f}</span>
 </div>
 """, unsafe_allow_html=True)
+
+# Add toggle for detailed explanation of ROI calculation
+with st.expander("ℹ️ How is this return calculated?"):
+    st.markdown(f"""
+    <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px;">
+        <h4 style="color: #00FFAA; margin-top: 0;">AI Investment Return</h4>
+        <p>This metric shows the multiplier effect of your AI investment - how many dollars you get back for every dollar spent on AI.</p>
+        <ul>
+            <li><strong>AI investment</strong> includes both the subscription cost (${subscription:,.0f}/mo) and variable AI usage costs (${ai_variable_cost:,.0f}/mo)</li>
+            <li><strong>Total value</strong> includes all forms of savings: direct operational savings, indirect productivity improvements, and strategic benefits</li>
+            <li><strong>Formula</strong>: <code>total_value / (subscription + ai_variable_cost)</code></li>
+            <li>At ${dollar_return:,.2f}, your AI investment is delivering a {(dollar_return-1)*100:.0f}% return on every dollar</li>
+        </ul>
+        <p><em>Note: This is a monthly return figure, meaning your annual return would be approximately ${dollar_return*12:,.2f} for every dollar invested.</em></p>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -289,6 +388,26 @@ fig1.update_layout(
     **TRANSPARENT_LAYOUT
 )
 st.plotly_chart(fig1, use_container_width=True)
+
+# Add toggle for detailed explanation of cost comparison
+with st.expander("ℹ️ How to read this cost comparison"):
+    st.markdown(f"""
+    <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px;">
+        <h4 style="color: #00FFAA; margin-top: 0;">Understanding the Cost Comparison</h4>
+        <p>This chart shows the financial difference between your current all-human operation and the proposed AI-hybrid model:</p>
+        <ul>
+            <li><strong>Left bar (100% Human)</strong>: Your current monthly spend (${baseline_human_cost:,.0f}) on human agents</li>
+            <li><strong>Right bar (Hybrid)</strong>: The combined costs of your new hybrid model, broken down into three components:</li>
+            <ul>
+                <li><strong>{100-automation_pct}% Human</strong>: Remaining human agent costs (${residual_human_cost:,.0f})</li>
+                <li><strong>{automation_pct}% AI Usage</strong>: Variable AI costs based on usage (${ai_variable_cost:,.0f})</li>
+                <li><strong>Subscription</strong>: Fixed monthly AI platform fee (${subscription:,.0f})</li>
+            </ul>
+            <li><strong>Total monthly savings</strong>: ${net_savings:,.0f} ({monthly_cost_efficiency:.1f}% reduction)</li>
+        </ul>
+        <p>This hybrid approach enables you to handle the same workload at a significantly lower cost while maintaining or improving quality and consistency.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -354,3 +473,19 @@ with right:
     </div>
     """
     st.markdown(html, unsafe_allow_html=True)
+
+# Add toggle for detailed explanation of savings breakdown
+with st.expander("ℹ️ Understanding the savings breakdown"):
+    st.markdown(f"""
+    <div style="background-color: rgba(0,0,0,0.1); padding: 15px; border-radius: 5px;">
+        <h4 style="color: #00FFAA; margin-top: 0;">Total Monthly Value: ${value_basis:,.0f}</h4>
+        <p>This stacked chart shows how your total monthly value is composed of different types of savings:</p>
+        <ul>
+            <li><strong>Net Savings (${net_savings:,.0f})</strong>: Direct operational cost reduction from implementing AI</li>
+            <li><strong>Indirect Savings{f" (${indirect_savings:,.0f})" if include_indirect else ""}</strong>: Productivity improvements and reduction in unproductive time</li>
+            <li><strong>HR Strategic Impact{f" (${strategic_savings:,.0f})" if include_hr else ""}</strong>: Higher-order benefits from improved workforce management</li>
+        </ul>
+        <p>The stacked nature of the chart shows how these different savings components contribute to your total value basis of ${value_basis:,.0f} per month.</p>
+        <p><em>Note: Toggle the "Include Indirect Value" and "Include HR Strategic Impact" options in the sidebar to see how these additional value components affect your overall ROI.</em></p>
+    </div>
+    """, unsafe_allow_html=True)
