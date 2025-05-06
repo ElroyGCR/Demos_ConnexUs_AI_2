@@ -221,7 +221,7 @@ with st.expander("ℹ️ How are these metrics calculated?"):
 st.markdown("---")
 
 # ─── AI Investment Impact ─────────────────────────────
-st.markdown("## AI Investment Impact", unsafe_allow_html=True)
+st.header("AI Investment Impact")
 
 # Added better explanatory text with consistent formatting
 st.markdown("""
@@ -270,6 +270,7 @@ st.markdown("---")
 
 # Add explanatory text for Indirect Impact section
 if include_indirect:
+    st.header("Indirect Benefits")
     st.markdown("""
     <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px; margin-top: 20px;">
         <p style="color: #ffffff; font-size: 16px; margin: 0;">
@@ -322,7 +323,7 @@ if include_indirect:
     st.markdown("---")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────
-st.subheader("Human vs Hybrid Cost Comparison")
+st.header("Human vs Hybrid Cost Comparison")
 
 # Added explanatory text with consistent formatting
 st.markdown("""
@@ -392,7 +393,7 @@ with st.expander("ℹ️ How to read this cost comparison"):
 st.markdown("---")
 
 # ─── Savings Breakdown ─────────────────────────────────
-st.subheader("Savings Breakdown")
+st.header("Savings Breakdown")
 
 # Added explanatory text with consistent formatting
 st.markdown("""
