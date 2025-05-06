@@ -244,21 +244,19 @@ with left:
     st.plotly_chart(fig2, use_container_width=True)
 
 with right:
-    # container to push cards down and space them out
     st.markdown("""
       <div style="
         display: flex;
         flex-direction: column;
-        margin-top: 40px;  /* drop the whole stack lower */
-        gap: 10px;         /* space between each card */
+        margin-top: 40px;    /* push the whole stack down */
+        row-gap: 10px;       /* gap *between* each card */
       ">
     """, unsafe_allow_html=True)
 
-    # exactly one of each
-    st.markdown(metric_block("Net Savings",       net_savings,       prefix="$"), unsafe_allow_html=True)
+    st.markdown(metric_block("Net Savings",    net_savings,      prefix="$"), unsafe_allow_html=True)
     if include_indirect:
-        st.markdown(metric_block("Indirect Sav.",    indirect_savings,  prefix="$"), unsafe_allow_html=True)
+        st.markdown(metric_block("Indirect Sav.", indirect_savings, prefix="$"), unsafe_allow_html=True)
     if include_hr:
-        st.markdown(metric_block("HR Strategic",     strategic_savings, prefix="$"), unsafe_allow_html=True)
+        st.markdown(metric_block("HR Strategic",  strategic_savings, prefix="$"), unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
