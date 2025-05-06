@@ -141,68 +141,44 @@ c2.markdown(metric_card("ROI on Prod (mo)", roi_prod_mo, suffix="%", decimals=1)
 c3.markdown(metric_card("Payback on Prod (mo)", payback_prod_mo, prefix="$", decimals=2), unsafe_allow_html=True)
 c4.markdown(metric_card("$1 → Savings", dollar_return, prefix="$", decimals=2), unsafe_allow_html=True)
 
-# --- 3) AI Investment Impact -------------------------------
-st.markdown("---")
-st.subheader("💡 AI Investment Impact")
-st.markdown(
-    "<div style='color:#DDD;font-size:14px;margin-bottom:8px;'>"
-    "Value returned for every $1 spent on AI usage + subscription."
-    "</div>", unsafe_allow_html=True)
-
-st.markdown(
-    f"""
-    <div style='
-      border:2px solid #00FFAA; border-radius:12px;
-      padding:16px; background:#111; text-align:center;
-    '>
-      <span style='font-size:20px;'>For every </span>
-      <span style='font-size:32px; color:#FFD700; font-weight:bold;'>$1</span>
-      <span style='font-size:20px;'> you invest in AI, you save:</span>
-      <span style='font-size:32px; color:#00FFAA; font-weight:bold;'>
-        ${dollar_return:,.0f}
-      </span>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# --- 4) Integration Basis Metrics --------------------------
-st.markdown("---")
-st.subheader("💼 Integration Basis Metrics")
-i1,i2,i3,i4 = st.columns(4, gap="large")
-i1.markdown(metric_card("ROI on Integration (mo)", roi_int_mo, suffix="%", decimals=1),
-            unsafe_allow_html=True)
-i2.markdown(metric_card("ROI on Integration (yr)", roi_int_mo*12, suffix="%", decimals=1),
-            unsafe_allow_html=True)
-i3.markdown(metric_card("Payback on Int (mo)", payback_int_mo, suffix="mo", decimals=2),
-            unsafe_allow_html=True)
-i4.markdown(metric_card("Value Basis", value_basis), unsafe_allow_html=True)
-
-# --- 5) Human vs Hybrid Cost Comparison --------------------
+# ─── 5) Human vs Hybrid Cost Comparison ───────────────────
 st.markdown("---")
 st.subheader("💰 Human vs Hybrid Cost Comparison")
 
+# Categories for the two bars
 cats = ["100% Human", "Hybrid"]
+
 fig = go.Figure()
 
+# 1) 100% Human bar (full baseline cost)
 fig.add_trace(go.Bar(
     name="100% Human Cost",
-    x=cats, y=[baseline_human_cost, 0],
+    x=cats,
+    y=[baseline_human_cost, 0],
     marker_color="#90CAF9"
 ))
+
+# 2a) Hybrid: residual human cost (the un-automated portion)
 fig.add_trace(go.Bar(
     name=f"{int((1-automation_pct)*100)}% Human",
-    x=cats, y=[0, residual_cost],
+    x=cats,
+    y=[0, residual_cost],
     marker_color="#64B5F6"
 ))
+
+# 2b) Hybrid: AI usage cost
 fig.add_trace(go.Bar(
     name=f"{int(automation_pct*100)}% AI Usage",
-    x=cats, y=[0, ai_cost],
+    x=cats,
+    y=[0, ai_cost],
     marker_color="#1E88E5"
 ))
+
+# 2c) Hybrid: Subscription
 fig.add_trace(go.Bar(
     name="Subscription",
-    x=cats, y=[0, subscription_cost],
+    x=cats,
+    y=[0, subscription_cost],
     marker_color="#FFA726"
 ))
 
@@ -211,8 +187,9 @@ fig.update_layout(
     yaxis_title="Monthly Spend ($)",
     legend=dict(orientation="h", yanchor="bottom", y=1.02),
     margin=dict(t=40, b=20, l=40, r=20),
-    **TRANSPARENT
+    **TRANSPARENT  # your transparent‐background dict
 )
+
 st.plotly_chart(fig, use_container_width=True)
 
 # --- 6) Savings Breakdown ----------------------------------
