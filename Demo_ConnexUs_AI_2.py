@@ -162,7 +162,6 @@ with i4:
 st.markdown("---")
 
 # ─── AI Investment Impact ─────────────────────────────────────────────
-# ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 
 # little caption
@@ -209,8 +208,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-st.markdown("---")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────────────────
 st.subheader("💰 Human vs Hybrid Cost Comparison")
