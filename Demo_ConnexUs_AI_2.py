@@ -236,28 +236,30 @@ with left:
         xaxis=dict(showticklabels=False),
         yaxis_title="Monthly Savings ($)",
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
-        margin=dict(t=30,b=30,l=0,r=0),
+        margin=dict(t=30, b=30, l=0, r=0),
+        height=600,                        # ← set a fixed height
         **TRANSPARENT_LAYOUT
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-# ←— right side now with flex container —→
 with right:
-    st.markdown(
-        "<div style='display:flex; flex-direction:column; "
-        "justify-content:space-between; height:450px; padding:0 8px;'>",
-        unsafe_allow_html=True
-    )
+    # flex‐container exactly the same height as the chart
+    container_style = """
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 600px;                   /* ← match chart height */
+        padding: 0 8px;
+    """
+    st.markdown(f"<div style='{container_style}'>", unsafe_allow_html=True)
 
-    # Top card
+    # top
     st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
-
-    # Middle card (if toggled)
+    # middle
     if include_indirect:
         st.markdown(metric_block("Indirect Sav.", indirect_savings),
                     unsafe_allow_html=True)
-
-    # Bottom card (if toggled)
+    # bottom
     if include_hr:
         st.markdown(metric_block("HR Strategic", strategic_savings),
                     unsafe_allow_html=True)
