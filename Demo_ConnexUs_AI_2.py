@@ -253,7 +253,7 @@ with i4:
                              icon="favicon-16x16.png", prefix="$"),
                 unsafe_allow_html=True)
 
-# --- 3-Column Cost vs Savings ---
+# --- 3-Column Cost vs. AI vs. Savings (unchanged) ---
 st.markdown("---")
 st.markdown("## 🏷️ Cost vs. AI vs. Savings")
 col1, col2, col3 = st.columns([1,1,1], gap="large")
@@ -266,15 +266,45 @@ with col2:
     st.markdown(metric_block(f"AI Cost ({automation_pct}% auto)", ai_enabled_cost,
                              icon="favicon-32x32.png", prefix="$"),
                 unsafe_allow_html=True)
-with col3:
-    st.markdown(small_card("Net Savings", net_savings, prefix="$"),
-                unsafe_allow_html=True)
+
+# --- New: Chart + Savings Cards Side-by-Side ---
+st.markdown("---")
+left, right = st.columns([3,1], gap="large")
+
+with left:
+    # your existing stacked-bar figure
+    fig = go.Figure()
+    cats = ["100% Human", f"{automation_pct}% AI", "Savings"]
+    # (add your traces exactly as before…)
+    # …
+    fig.update_layout(
+        barmode='stack',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+        margin=dict(t=40,b=0,l=0,r=0),
+        xaxis_title="",
+        yaxis_title="Amount ($)",
+        **TRANSPARENT
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+with right:
+    st.markdown("<div style='display:flex;flex-direction:column; gap:10px;'>", unsafe_allow_html=True)
+
+    # Always show Net Savings
+    st.markdown(small_card("Net Savings", net_savings, prefix="$"), unsafe_allow_html=True)
+
+    # Conditionally show Indirect
     if use_indirects:
         st.markdown(small_card("Indirect Sav.", indirect_savings, prefix="$"),
                     unsafe_allow_html=True)
+
+    # Conditionally show HR Strategic
     if include_strategic:
         st.markdown(small_card("HR Strategic", strategic_savings, prefix="$"),
                     unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
 # --- Stacked-Bar Chart ---
 fig = go.Figure()
