@@ -147,11 +147,7 @@ roi_prod_mo = (value_basis / baseline_human_cost) * 100 if baseline_human_cost >
 payback_mo_prod = baseline_human_cost / value_basis if value_basis > 0 else float('inf')
 
 # ─── Main Metrics Layout ───────────────────────────────
-col_logo, col_title = st.columns([1, 20])
-with col_logo:
-    st.image("connexus_logo.png", width=60)
-with col_title:
-    st.title("ConnexUS AI ROI Calculator")
+st.title("ConnexUS AI ROI Calculator")
 st.markdown("---")
 
 # Add explanatory text with proper spacing and formatting
@@ -225,11 +221,7 @@ with st.expander("ℹ️ How are these metrics calculated?"):
 st.markdown("---")
 
 # ─── AI Investment Impact ─────────────────────────────
-col_logo, col_title = st.columns([1, 20])
-with col_logo:
-    st.image("connexus_logo.png", width=60)
-with col_title:
-    st.markdown("## AI Investment Impact", unsafe_allow_html=True)
+st.markdown("## AI Investment Impact", unsafe_allow_html=True)
 
 # Added better explanatory text with consistent formatting
 st.markdown("""
@@ -330,11 +322,7 @@ if include_indirect:
     st.markdown("---")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────
-col_logo, col_title = st.columns([1, 20])
-with col_logo:
-    st.image("connexus_logo.png", width=60)
-with col_title:
-    st.subheader("Human vs Hybrid Cost Comparison")
+st.subheader("Human vs Hybrid Cost Comparison")
 
 # Added explanatory text with consistent formatting
 st.markdown("""
@@ -404,11 +392,7 @@ with st.expander("ℹ️ How to read this cost comparison"):
 st.markdown("---")
 
 # ─── Savings Breakdown ─────────────────────────────────
-col_logo, col_title = st.columns([1, 20])
-with col_logo:
-    st.image("connexus_logo.png", width=60)
-with col_title:
-    st.subheader("Savings Breakdown")
+st.subheader("Savings Breakdown")
 
 # Added explanatory text with consistent formatting
 st.markdown("""
