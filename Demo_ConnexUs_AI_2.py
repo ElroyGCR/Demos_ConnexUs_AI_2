@@ -243,25 +243,28 @@ with left:
     st.plotly_chart(fig2, use_container_width=True)
 
 with right:
-    # wrap cards in a flex column that matches chart height
+    # flex‐container that stretches to match the chart height
     st.markdown(
-        "<div style='"
-        "display:flex; "
-        "flex-direction:column; "
-        "justify-content:space-between; "
-        "height:450px;"  # tweak to match your fig2 height
-        "'>",
+        """
+        <div style="
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 450px;  /* tweak this so it lines up with the chart above */
+            padding-left: 10px;
+        ">
+        """,
         unsafe_allow_html=True
     )
 
     # Top card
     st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
 
-    # Middle card (only if include_indirect)
+    # Middle card (only if indirect is on)
     if include_indirect:
         st.markdown(metric_block("Indirect Sav.", indirect_savings), unsafe_allow_html=True)
 
-    # Bottom card (only if include_hr)
+    # Bottom card (only if HR strategic is on)
     if include_hr:
         st.markdown(metric_block("HR Strategic", strategic_savings), unsafe_allow_html=True)
 
