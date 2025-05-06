@@ -148,7 +148,7 @@ st.subheader("💰 Human vs Hybrid Cost Comparison")
 cats = ["100% Human", "Hybrid"]
 fig = go.Figure()
 
-# 1) 100% Human Cost bar
+# 1) 100% Human Cost
 fig.add_trace(go.Bar(
     name="100% Human Cost",
     x=cats,
@@ -156,7 +156,7 @@ fig.add_trace(go.Bar(
     marker_color="#90CAF9",
 ))
 
-# 2a) Hybrid: residual human cost (the un-automated %)
+# 2a) Hybrid: un-automated human portion
 fig.add_trace(go.Bar(
     name=f"{int((1-automation_pct)*100)}% Human",
     x=cats,
@@ -172,11 +172,11 @@ fig.add_trace(go.Bar(
     marker_color="#1E88E5",
 ))
 
-# 2c) Hybrid: Subscription (flat monthly fee)
+# 2c) Hybrid: Subscription fee
 fig.add_trace(go.Bar(
     name="Subscription",
     x=cats,
-    y=[0, subscription],            # <-- use `subscription`, not `subscription_cost`
+    y=[0, subscription],
     marker_color="#FFA726",
 ))
 
@@ -185,7 +185,7 @@ fig.update_layout(
     yaxis_title="Monthly Spend ($)",
     legend=dict(orientation="h", yanchor="bottom", y=1.02),
     margin=dict(t=40, b=20, l=40, r=20),
-    **TRANSPARENT_LAYOUT       # your global transparent bg
+    **TRANSPARENT_LAYOUT
 )
 
 st.plotly_chart(fig, use_container_width=True)
