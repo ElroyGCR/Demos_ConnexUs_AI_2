@@ -393,8 +393,14 @@ with st.expander("ℹ️ How to read this cost comparison"):
 st.markdown("---")
 
 # ─── Savings Breakdown ─────────────────────────────────
-st.header("Savings Breakdown")
-
+st.markdown("## Savings Breakdown")
+st.markdown("""
+<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+    <p style="color: #ffffff; font-size: 16px; margin: 0;">
+        This breakdown shows direct savings from AI automation alongside indirect benefits from efficiency improvements.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 # Added explanatory text with consistent formatting
 st.markdown("""
 <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
