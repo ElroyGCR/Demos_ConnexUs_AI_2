@@ -135,7 +135,7 @@ roi_integ_yr = roi_integ_mo * 12
 payback_mo_integ = integration_fee / value_basis if value_basis>0 else float('inf')
 roi_prod_mo = (value_basis / baseline_human_cost) * 100 if baseline_human_cost>0 else 0
 payback_mo_prod = baseline_human_cost / value_basis if value_basis>0 else float('inf')
-monthly_cost_efficiency = (value_basis / baseline_human_cost) * 100 if baseline_human_cost>0 else float('inf')
+monthly_cost_efficiency = (value_basis / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
 dollar_return = (value_basis / (subscription + ai_usage_cost)) if (subscription + ai_usage_cost)>0 else 0
 
 # ─── Main Layout ───────────────────────────────────────────────────────
@@ -168,7 +168,6 @@ with i4:
 
 st.markdown("---")
 
-# ─── AI Investment Impact ─────────────────────────────────────────────
 # ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 
