@@ -145,13 +145,13 @@ st.markdown("---")
 # Core Metrics Row
 c1, c2, c3, c4 = st.columns(4)
 with c1:
-    st.markdown(metric_block("Net Monthly Savings", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Net Monthly Savings", net_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 with c2:
     st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 with c3:
     st.markdown(metric_block("Payback on Prod (mo)", payback_mo_prod, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
 with c4:
-    st.markdown(metric_block("Monthly Cost Efficiency", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
+   st.markdown(metric_block("Monthly Cost Efficiency", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 
 st.markdown("---")
 
