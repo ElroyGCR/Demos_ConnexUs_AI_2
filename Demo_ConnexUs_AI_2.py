@@ -207,23 +207,26 @@ st.markdown("---")
 st.subheader("💸 Savings Breakdown")
 left, right = st.columns([3,1], gap="large")
 
-# ←— left side unchanged —→
+# ─── Left: the stacked‐bar savings chart ─────────────────────────────
 with left:
     fig2 = go.Figure()
+
     # Net Savings
     fig2.add_trace(go.Bar(
         name="Net Savings",
         x=["Savings"], y=[net_savings],
         marker_color="#66BB6A"
     ))
-    # Indirect Savings
+
+    # Indirect Savings (only if toggled on)
     if include_indirect:
         fig2.add_trace(go.Bar(
             name="Indirect Sav.",
             x=["Savings"], y=[indirect_savings],
             marker_color="#FFA726"
         ))
-    # HR Strategic
+
+    # HR Strategic Savings (only if toggled on)
     if include_hr:
         fig2.add_trace(go.Bar(
             name="HR Strategic",
@@ -237,31 +240,22 @@ with left:
         yaxis_title="Monthly Savings ($)",
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
         margin=dict(t=30, b=30, l=0, r=0),
-        height=600,                        # ← set a fixed height
         **TRANSPARENT_LAYOUT
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-with right:
-    # flex‐container exactly the same height as the chart
-    container_style = """
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 600px;                   /* ← match chart height */
-        padding: 0 8px;
-    """
-    st.markdown(f"<div style='{container_style}'>", unsafe_allow_html=True)
 
-    # top
+# ─── Right: the three metric cards, in exact the same vertical spot they were before ────────────
+with right:
+    # Net savings
     st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
-    # middle
+
+    # Indirect
     if include_indirect:
         st.markdown(metric_block("Indirect Sav.", indirect_savings),
                     unsafe_allow_html=True)
-    # bottom
+
+    # HR strategic
     if include_hr:
         st.markdown(metric_block("HR Strategic", strategic_savings),
                     unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
