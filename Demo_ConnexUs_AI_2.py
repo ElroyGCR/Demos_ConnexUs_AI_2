@@ -38,7 +38,7 @@ if watermark_b64:
     st.markdown(f"""
     <style>
     .watermark {{
-      position:fixed; top:200px; left:60%;
+      position:fixed; top:20px; left:55%;
       transform:translateX(-50%);
       width:800px; height:800px;
       opacity:0.15; z-index:0;
