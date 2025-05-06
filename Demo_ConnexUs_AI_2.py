@@ -205,36 +205,32 @@ st.markdown("---")
 
 # ─── Savings Breakdown ───────────────────────────────────────────────
 st.subheader("💸 Savings Breakdown")
-left, right = st.columns([3, 1], gap="large")
+left, right = st.columns([3,1], gap="large")
 
 with left:
     fig2 = go.Figure()
-    # Net Savings
+    # Net
     fig2.add_trace(go.Bar(
         name="Net Savings",
-        x=["Savings"],
-        y=[net_savings],
-        marker_color="#66BB6A",
+        x=["Savings"], y=[net_savings],
+        marker_color="#66BB6A"
     ))
-    # Indirect Savings (if toggled)
+    # Indirect
     if include_indirect:
         fig2.add_trace(go.Bar(
             name="Indirect Sav.",
-            x=["Savings"],
-            y=[indirect_savings],
-            marker_color="#FFA726",
+            x=["Savings"], y=[indirect_savings],
+            marker_color="#FFA726"
         ))
-    # HR Strategic (if toggled)
+    # HR Strategic
     if include_hr:
         fig2.add_trace(go.Bar(
             name="HR Strategic",
-            x=["Savings"],
-            y=[strategic_savings],
-            marker_color="#29B6F6",
+            x=["Savings"], y=[strategic_savings],
+            marker_color="#29B6F6"
         ))
-
     fig2.update_layout(
-        barmode="stack",
+        barmode='stack',
         xaxis=dict(showticklabels=False),
         yaxis_title="Monthly Savings ($)",
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
@@ -244,19 +240,15 @@ with left:
     st.plotly_chart(fig2, use_container_width=True)
 
 with right:
-    st.markdown("""
-      <div style="
-        display: flex;
-        flex-direction: column;
-        margin-top: 40px;    /* push the whole stack down */
-        row-gap: 10px;       /* gap *between* each card */
-      ">
-    """, unsafe_allow_html=True)
+    # Net Savings
+    st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
+    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
 
-    st.markdown(metric_block("Net Savings",    net_savings,      prefix="$"), unsafe_allow_html=True)
+    # Indirect Savings (toggle)
     if include_indirect:
-        st.markdown(metric_block("Indirect Sav.", indirect_savings, prefix="$"), unsafe_allow_html=True)
-    if include_hr:
-        st.markdown(metric_block("HR Strategic",  strategic_savings, prefix="$"), unsafe_allow_html=True)
+        st.markdown(metric_block("Indirect Sav.", indirect_savings), unsafe_allow_html=True)
+        st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    # HR Strategic Savings (toggle)
+    if include_hr:
+        st.markdown(metric_block("HR Strategic", strategic_savings), unsafe_allow_html=True)
