@@ -153,6 +153,15 @@ payback_mo_prod = baseline_human_cost / value_basis if value_basis > 0 else floa
 st.title("🚀 ConnexUS AI ROI Calculator")
 st.markdown("---")
 
+# Add explanatory text with proper spacing and formatting
+st.markdown("""
+<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+    <p style="color: #ffffff; font-size: 16px; margin: 0;">
+        These values reflect direct cost savings compared to your human-only baseline operations.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 c1, c2, c3, c4 = st.columns(4)
 with c1:
     st.markdown(metric_block("Net Monthly Savings", net_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
@@ -175,13 +184,35 @@ with i4:
 
 st.markdown("---")
 
+# Add explanatory text for Indirect Impact section
+if include_indirect:
+    st.markdown("""
+    <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px; margin-top: 20px;">
+        <p style="color: #ffffff; font-size: 16px; margin: 0;">
+            These gains reflect enhanced output from improved efficiency and revenue opportunities.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    indirect_col1, indirect_col2 = st.columns(2)
+    with indirect_col1:
+        st.markdown(metric_block("Indirect Savings", indirect_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    if include_hr:
+        with indirect_col2:
+            st.markdown(metric_block("HR Strategic Impact", strategic_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    
+    st.markdown("---")
+
 # ─── AI Investment Impact ─────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 
+# Added better explanatory text with consistent formatting
 st.markdown("""
-<p style='text-align:center; font-size:16px; color:#aaa;'>
-Shows how much value is returned for every dollar spent on AI — includes cost savings, indirect and strategic gains.
-</p>
+<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+    <p style="color: #ffffff; font-size: 16px; margin: 0;">
+        Shows how much value is returned for every dollar spent on AI — includes cost savings, indirect and strategic gains.
+    </p>
+</div>
 """, unsafe_allow_html=True)
 
 ai_spend = subscription + ai_variable_cost
@@ -209,6 +240,16 @@ st.markdown("---")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────
 st.subheader("💰 Human vs Hybrid Cost Comparison")
+
+# Added explanatory text with consistent formatting
+st.markdown("""
+<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+    <p style="color: #ffffff; font-size: 16px; margin: 0;">
+        This chart shows how your current human-only approach compares to a hybrid model with AI automation.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 fig1 = go.Figure()
 cats = ["100% Human", "Hybrid"]
 
@@ -250,6 +291,16 @@ st.markdown("---")
 
 # ─── Savings Breakdown ─────────────────────────────────
 st.subheader("💸 Savings Breakdown")
+
+# Added explanatory text with consistent formatting
+st.markdown("""
+<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+    <p style="color: #ffffff; font-size: 16px; margin: 0;">
+        This breakdown shows direct savings from AI automation alongside indirect benefits from efficiency improvements.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 left, right = st.columns([3, 1], gap="large")
 
 with left:
