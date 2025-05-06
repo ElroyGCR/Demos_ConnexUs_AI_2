@@ -153,9 +153,9 @@ st.markdown("---")
 # ─── Main Metrics Section ──────────────────────────────
 col_icon1, col_text1 = st.columns([1, 20])
 with col_icon1:
-    st.image("favicon-32x32.png", width=24)
+    st.image("favicon-32x32.png", width=32)
 with col_text1:
-    st.markdown("## Metrics Overview", unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">Metrics Overview</span>', unsafe_allow_html=True)
 
 st.markdown("""
 <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
@@ -229,9 +229,9 @@ st.markdown("---")
 # ─── AI Investment Impact ─────────────────────────────
 col_icon2, col_text2 = st.columns([1, 20])
 with col_icon2:
-    st.image("favicon-32x32.png", width=24)
+    st.image("favicon-32x32.png", width=32)
 with col_text2:
-    st.markdown("## AI Investment Impact", unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">AI Investment Impact</span>', unsafe_allow_html=True)
 
 # Added better explanatory text with consistent formatting
 st.markdown("""
@@ -282,9 +282,9 @@ st.markdown("---")
 if include_indirect:
     col_icon3, col_text3 = st.columns([1, 20])
     with col_icon3:
-        st.image("favicon-32x32.png", width=24)
+        st.image("favicon-32x32.png", width=32)
     with col_text3:
-        st.markdown("## Indirect Benefits", unsafe_allow_html=True)
+        st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">Indirect Benefits</span>', unsafe_allow_html=True)
         
     st.markdown("""
     <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
@@ -340,9 +340,9 @@ if include_indirect:
 # ─── Human vs Hybrid Cost Comparison ───────────────────
 col_icon4, col_text4 = st.columns([1, 20])
 with col_icon4:
-    st.image("favicon-32x32.png", width=24)
+    st.image("favicon-32x32.png", width=32)
 with col_text4:
-    st.markdown("## Human vs Hybrid Cost Comparison", unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">Human vs Hybrid Cost Comparison</span>', unsafe_allow_html=True)
 
 # Added explanatory text with consistent formatting
 st.markdown("""
@@ -414,9 +414,9 @@ st.markdown("---")
 # ─── Savings Breakdown ─────────────────────────────────
 col_icon5, col_text5 = st.columns([1, 20])
 with col_icon5:
-    st.image("favicon-32x32.png", width=24)
+    st.image("favicon-32x32.png", width=32)
 with col_text5:
-    st.markdown("## Savings Breakdown", unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">Savings Breakdown</span>', unsafe_allow_html=True)
 
 # Added explanatory text with consistent formatting
 st.markdown("""
