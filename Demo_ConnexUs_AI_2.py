@@ -146,11 +146,17 @@ payback_mo_integ = integration_fee / value_basis if value_basis > 0 else float('
 roi_prod_mo = (value_basis / baseline_human_cost) * 100 if baseline_human_cost > 0 else 0
 payback_mo_prod = baseline_human_cost / value_basis if value_basis > 0 else float('inf')
 
-# ─── Main Metrics Layout ───────────────────────────────
+# ─── Main Title ─────────────────────────────────────────
 st.title("ConnexUS AI ROI Calculator")
 st.markdown("---")
 
-# Add explanatory text with proper spacing and formatting
+# ─── Main Metrics Section ──────────────────────────────
+col_icon1, col_text1 = st.columns([1, 20])
+with col_icon1:
+    st.image("favicon-32x32.png", width=24)
+with col_text1:
+    st.markdown("## Metrics Overview", unsafe_allow_html=True)
+
 st.markdown("""
 <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
     <p style="color: #ffffff; font-size: 16px; margin: 0;">
@@ -221,7 +227,11 @@ with st.expander("ℹ️ How are these metrics calculated?"):
 st.markdown("---")
 
 # ─── AI Investment Impact ─────────────────────────────
-st.header("AI Investment Impact")
+col_icon2, col_text2 = st.columns([1, 20])
+with col_icon2:
+    st.image("favicon-32x32.png", width=24)
+with col_text2:
+    st.markdown("## AI Investment Impact", unsafe_allow_html=True)
 
 # Added better explanatory text with consistent formatting
 st.markdown("""
@@ -270,9 +280,14 @@ st.markdown("---")
 
 # Add explanatory text for Indirect Impact section
 if include_indirect:
-    st.header("Indirect Benefits")
+    col_icon3, col_text3 = st.columns([1, 20])
+    with col_icon3:
+        st.image("favicon-32x32.png", width=24)
+    with col_text3:
+        st.markdown("## Indirect Benefits", unsafe_allow_html=True)
+        
     st.markdown("""
-    <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px; margin-top: 20px;">
+    <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
         <p style="color: #ffffff; font-size: 16px; margin: 0;">
             These gains reflect enhanced output from improved efficiency and revenue opportunities.
         </p>
@@ -323,7 +338,11 @@ if include_indirect:
     st.markdown("---")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────
-st.header("Human vs Hybrid Cost Comparison")
+col_icon4, col_text4 = st.columns([1, 20])
+with col_icon4:
+    st.image("favicon-32x32.png", width=24)
+with col_text4:
+    st.markdown("## Human vs Hybrid Cost Comparison", unsafe_allow_html=True)
 
 # Added explanatory text with consistent formatting
 st.markdown("""
@@ -393,14 +412,12 @@ with st.expander("ℹ️ How to read this cost comparison"):
 st.markdown("---")
 
 # ─── Savings Breakdown ─────────────────────────────────
-st.markdown("## Savings Breakdown")
-st.markdown("""
-<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-    <p style="color: #ffffff; font-size: 16px; margin: 0;">
-        This breakdown shows direct savings from AI automation alongside indirect benefits from efficiency improvements.
-    </p>
-</div>
-""", unsafe_allow_html=True)
+col_icon5, col_text5 = st.columns([1, 20])
+with col_icon5:
+    st.image("favicon-32x32.png", width=24)
+with col_text5:
+    st.markdown("## Savings Breakdown", unsafe_allow_html=True)
+
 # Added explanatory text with consistent formatting
 st.markdown("""
 <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
