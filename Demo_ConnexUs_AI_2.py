@@ -169,8 +169,8 @@ st.markdown(
 )
 
 # always calculate base return from net savings
-ai_spend = subscription + ai_usage_cost
-base_return = net_savings / ai_spend if ai_spend else 0.0
+ai_spend     = subscription + ai_usage_cost
+base_return  = net_savings / ai_spend if ai_spend else 0.0
 
 # then add the optional bits
 extra = 0.0
