@@ -24,6 +24,15 @@ if favicon_b64:
     )
 
 # ─── Global Styles & Watermark ────────────────────────────────────────
+def _load_base64(path):
+    try:
+        img = Image.open(path)
+        buf = BytesIO()
+        img.save(buf, format="PNG")
+        return base64.b64encode(buf.getvalue()).decode()
+    except:
+        return None
+
 watermark_b64 = _load_base64("connexus_logo_watermark.png") 
 if watermark_b64:
     st.markdown(f"""
