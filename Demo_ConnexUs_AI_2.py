@@ -145,7 +145,7 @@ ai_enabled_cost = ai_usage_cost + residual_cost + subscription
 net_savings = baseline_human_cost - ai_enabled_cost
 
 # Monthly Cost Efficiency
-monthly_cost_efficiency = excel_round((baseline_human_cost / net_savings) * 100, 1) if net_savings > 0 else float('inf')
+monthly_cost_efficiency = (net_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
 
 # Indirect savings (production uplift on full baseline)
 indirect_savings = baseline_human_cost * (production_pct/100) if include_indirect else 0
