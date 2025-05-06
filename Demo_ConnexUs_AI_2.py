@@ -207,24 +207,23 @@ st.markdown("---")
 st.subheader("💸 Savings Breakdown")
 left, right = st.columns([3,1], gap="large")
 
+# ←— left side unchanged —→
 with left:
-    # Rebuild your stacked‐bar savings figure as `fig2`
     fig2 = go.Figure()
-
-    # 1) Net Savings
+    # Net Savings
     fig2.add_trace(go.Bar(
         name="Net Savings",
         x=["Savings"], y=[net_savings],
         marker_color="#66BB6A"
     ))
-    # 2) Indirect Savings (if toggled)
+    # Indirect Savings
     if include_indirect:
         fig2.add_trace(go.Bar(
             name="Indirect Sav.",
             x=["Savings"], y=[indirect_savings],
             marker_color="#FFA726"
         ))
-    # 3) HR Strategic (if toggled)
+    # HR Strategic
     if include_hr:
         fig2.add_trace(go.Bar(
             name="HR Strategic",
@@ -237,35 +236,30 @@ with left:
         xaxis=dict(showticklabels=False),
         yaxis_title="Monthly Savings ($)",
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
-        margin=dict(t=30, b=30, l=0, r=0),
+        margin=dict(t=30,b=30,l=0,r=0),
         **TRANSPARENT_LAYOUT
     )
     st.plotly_chart(fig2, use_container_width=True)
 
+# ←— right side now with flex container —→
 with right:
-    # flex‐container that stretches to match the chart height
     st.markdown(
-        """
-        <div style="
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 450px;  /* tweak this so it lines up with the chart above */
-            padding-left: 10px;
-        ">
-        """,
+        "<div style='display:flex; flex-direction:column; "
+        "justify-content:space-between; height:450px; padding:0 8px;'>",
         unsafe_allow_html=True
     )
 
     # Top card
     st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
 
-    # Middle card (only if indirect is on)
+    # Middle card (if toggled)
     if include_indirect:
-        st.markdown(metric_block("Indirect Sav.", indirect_savings), unsafe_allow_html=True)
+        st.markdown(metric_block("Indirect Sav.", indirect_savings),
+                    unsafe_allow_html=True)
 
-    # Bottom card (only if HR strategic is on)
+    # Bottom card (if toggled)
     if include_hr:
-        st.markdown(metric_block("HR Strategic", strategic_savings), unsafe_allow_html=True)
+        st.markdown(metric_block("HR Strategic", strategic_savings),
+                    unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
