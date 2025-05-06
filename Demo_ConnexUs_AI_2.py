@@ -207,20 +207,23 @@ st.markdown("---")
 st.subheader("💸 Savings Breakdown")
 left, right = st.columns([3,1], gap="large")
 
-# — left chart stays exactly the same —
+# — left side stays as is —
 with left:
     fig2 = go.Figure()
+    # Net
     fig2.add_trace(go.Bar(
         name="Net Savings",
         x=["Savings"], y=[net_savings],
         marker_color="#66BB6A"
     ))
+    # Indirect
     if include_indirect:
         fig2.add_trace(go.Bar(
             name="Indirect Sav.",
             x=["Savings"], y=[indirect_savings],
             marker_color="#FFA726"
         ))
+    # HR Strategic
     if include_hr:
         fig2.add_trace(go.Bar(
             name="HR Strategic",
@@ -237,13 +240,18 @@ with left:
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-# — right cards with 10px gap between each —
+# — right side: three cards, 10px gap, pushed down to match chart height —
 with right:
-    st.markdown(
-        "<div style='display:flex; flex-direction:column; row-gap:10px;'>"
-        + metric_block("Net Savings", net_savings)
-        + (metric_block("Indirect Sav.", indirect_savings) if include_indirect else "")
-        + (metric_block("HR Strategic", strategic_savings)   if include_hr     else "")
-        + "</div>",
-        unsafe_allow_html=True
-    )
+    html = f"""
+    <div style='
+        display: flex;
+        flex-direction: column;
+        row-gap: 10px;
+        margin-top: 40px;
+    '>
+      {metric_block("Net Savings",      net_savings)}
+      {metric_block("Indirect Sav.",    indirect_savings) if include_indirect else ""}
+      {metric_block("HR Strategic",     strategic_savings) if include_hr     else ""}
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
