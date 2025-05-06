@@ -66,8 +66,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─── Helper Functions ──────────────────────────────────────────────────
-def metric_block(label, value, prefix="$", suffix="", value_format="{:,.2f}"):
-    formatted_value = value_format.format(value)
+def metric_block(label, value, prefix="", suffix="", value_format="{:,.2f}"):
+    if value == float('inf') or value != value:  # catch inf and NaN
+        formatted_value = "N/A"
+        prefix = ""
+        suffix = ""
+    else:
+        formatted_value = value_format.format(value)
+    
     return f"""
     <div class="metric-card">
       <div class="metric-label">{label}</div>
