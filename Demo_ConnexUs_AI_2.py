@@ -142,37 +142,45 @@ st.markdown(f"""
 # --- 3) Human vs Hybrid Cost Comparison ---
 st.markdown("---")
 st.subheader("💰 Human vs Hybrid Cost Comparison")
+
+# Define categories
 categories = ["100% Human", "Hybrid"]
+
 fig = go.Figure()
 
-# 100% Human bar
+# 1) 100% Human bar
 fig.add_trace(go.Bar(
     name="100% Human Cost",
-    x=categories, y=[baseline_human, 0],
+    x=categories,
+    y=[baseline_human, 0],
     marker_color="#90CAF9"
 ))
 
-# Hybrid residual human
+# 2a) Hybrid: residual human cost (the un-automated portion)
 fig.add_trace(go.Bar(
     name=f"{int((1-automation_pct)*100)}% Human",
-    x=categories, y=[0, res_cost],
+    x=categories,
+    y=[0, residual_cost],
     marker_color="#64B5F6"
 ))
 
-# Hybrid AI usage
+# 2b) Hybrid: AI usage cost
 fig.add_trace(go.Bar(
     name=f"{int(automation_pct*100)}% AI Usage",
-    x=categories, y=[0, ai_cost],
+    x=categories,
+    y=[0, ai_cost],
     marker_color="#1E88E5"
 ))
 
-# Hybrid subscription
+# 2c) Hybrid: Subscription fee
 fig.add_trace(go.Bar(
     name="Subscription",
-    x=categories, y=[0, subscription],
+    x=categories,
+    y=[0, subscription],
     marker_color="#FFA726"
 ))
 
+# Layout tweaks
 fig.update_layout(
     barmode="stack",
     yaxis_title="Monthly Spend ($)",
@@ -180,6 +188,7 @@ fig.update_layout(
     margin=dict(t=40, b=20, l=0, r=0),
     **TRANSPARENT
 )
+
 st.plotly_chart(fig, use_container_width=True)
 
 # --- 4) Savings Breakdown + Cards ---
