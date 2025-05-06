@@ -253,30 +253,51 @@ with i4:
                              icon="favicon-16x16.png", prefix="$"),
                 unsafe_allow_html=True)
 
-# ─── Human vs AI Cost Comparison ───────────────────────────────
-st.markdown("## 💰 Human vs AI Cost Comparison")
-fig_hum_ai = go.Figure(data=[
-    go.Bar(
-        name="100% Human Cost",
-        x=["Cost"],
-        y=[baseline_human],
-        marker_color="#90CAF9"
-    ),
-    go.Bar(
-        name="100% AI Cost",
-        x=["Cost"],
-        y=[ai_enabled_cost],
-        marker_color="#1E88E5"
-    )
-])
-fig_hum_ai.update_layout(
-    barmode='group',
+# --- Human vs Hybrid (partial AI) Cost Comparison ---
+st.markdown("## 💰 Human vs Hybrid Cost Comparison")
+
+fig = go.Figure()
+
+# 1) 100% Human bar
+fig.add_trace(go.Bar(
+    name="100% Human Cost",
+    x=["Cost"],
+    y=[baseline_human_cost],           # your full human baseline
+    marker_color="#90CAF9",
+))
+
+# 2a) Hybrid: residual human cost (unautomated %)
+fig.add_trace(go.Bar(
+    name=f"{100-automation_pct}% Human",
+    x=["Cost"],
+    y=[residual_cost],                 # cost for the non‐automated portion
+    marker_color="#64B5F6",
+))
+
+# 2b) Hybrid: AI cost (usage + subscription)
+fig.add_trace(go.Bar(
+    name=f"{automation_pct}% AI",
+    x=["Cost"],
+    y=[ai_cost + subscription],        # AI minutes cost + full subscription
+    marker_color="#1E88E5",
+))
+
+fig.update_layout(
+    barmode="stack",
     xaxis=dict(showticklabels=False),
     yaxis_title="Monthly Spend ($)",
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ),
     margin=dict(t=30, b=30, l=0, r=0),
-    **TRANSPARENT
+    **TRANSPARENT_LAYOUT
 )
-st.plotly_chart(fig_hum_ai, use_container_width=True)
+
+st.plotly_chart(fig, use_container_width=True)
 
 
 # ─── Savings Breakdown ───────────────────────────────
