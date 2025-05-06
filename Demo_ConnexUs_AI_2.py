@@ -118,7 +118,7 @@ roi_integ_yr = excel_round(roi_integ_mo * 12, 1)
 payback_mo_integ = excel_round(integration_fee / value_basis, 2) if value_basis>0 else float('inf')
 roi_prod_mo = excel_round((value_basis / baseline_human_cost) * 100, 1) if baseline_human_cost>0 else 0
 payback_mo_prod = excel_round(baseline_human_cost / value_basis, 2) if value_basis>0 else float('inf')
-monthly_cost_efficiency = excel_round((net_savings / baseline_human_cost) * 100, 1) if baseline_human_cost>0 else float('inf')
+monthly_cost_efficiency = excel_round((value_basis / baseline_human_cost) * 100, 1) if baseline_human_cost>0 else float('inf')
 dollar_return = excel_round((value_basis / (subscription + ai_usage_cost)), 2) if (subscription + ai_usage_cost)>0 else 0
 
 # ─── Layout ───────────────────────────────────────────────────────
@@ -127,7 +127,7 @@ st.markdown("---")
 
 c1, c2, c3, c4 = st.columns(4)
 with c1:
-    st.markdown(metric_block("Net Monthly Savings", net_savings), unsafe_allow_html=True)
+    st.markdown(metric_block("Net Monthly Savings", value_basis), unsafe_allow_html=True)
 with c2:
     st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, "", "%"), unsafe_allow_html=True)
 with c3:
@@ -168,10 +168,8 @@ left, right = st.columns([3,1], gap="large")
 with left:
     fig2 = go.Figure()
     fig2.add_trace(go.Bar(name="Net Savings", x=["Savings"], y=[net_savings], marker_color="#66BB6A"))
-    if include_indirect:
-        fig2.add_trace(go.Bar(name="Indirect Sav.", x=["Savings"], y=[indirect_savings], marker_color="#FFA726"))
-    if include_hr:
-        fig2.add_trace(go.Bar(name="HR Strategic", x=["Savings"], y=[strategic_savings], marker_color="#29B6F6"))
+    fig2.add_trace(go.Bar(name="Indirect Sav.", x=["Savings"], y=[indirect_savings if include_indirect else 0], marker_color="#FFA726"))
+    fig2.add_trace(go.Bar(name="HR Strategic", x=["Savings"], y=[strategic_savings if include_hr else 0], marker_color="#29B6F6"))
     fig2.update_layout(barmode='stack', xaxis=dict(showticklabels=False), yaxis_title="Monthly Savings ($)", legend=dict(orientation="h", yanchor="bottom", y=1.02), margin=dict(t=30, b=30, l=0, r=0), **TRANSPARENT_LAYOUT)
     st.plotly_chart(fig2, use_container_width=True)
 
