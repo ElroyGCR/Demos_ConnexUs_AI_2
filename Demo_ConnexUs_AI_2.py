@@ -172,6 +172,9 @@ with c3:
 with c4:
     st.markdown(metric_block("Monthly Cost Efficiency", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 
+# Add spacing between the rows of metric cards
+st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+
 i1, i2, i3, i4 = st.columns(4)
 with i1:
     st.markdown(metric_block("ROI on Integration (mo)", roi_integ_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
@@ -180,7 +183,7 @@ with i2:
 with i3:
     st.markdown(metric_block("Payback on Int (mo)", payback_mo_integ, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
 with i4:
-    st.markdown(metric_block("Value Basis", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Total Value (Combined)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 
 st.markdown("---")
 
