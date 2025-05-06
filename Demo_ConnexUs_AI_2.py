@@ -168,15 +168,18 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# compute $1 → savings (always use net savings; add indirect & HR only when toggled)
+# always calculate base return from net savings
 ai_spend = subscription + ai_usage_cost
 base_return = net_savings / ai_spend if ai_spend else 0.0
-extra_return = 0.0
+
+# then add the optional bits
+extra = 0.0
 if include_indirect:
-    extra_return += indirect_savings / ai_spend
+    extra += indirect_savings / ai_spend
 if include_hr:
-    extra_return += strategic_savings / ai_spend
-dollar_return = base_return + extra_return
+    extra += strategic_savings / ai_spend
+
+dollar_return = base_return + extra
 
 st.markdown(f"""
 <div style='
