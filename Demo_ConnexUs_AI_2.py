@@ -137,6 +137,9 @@ ai_enabled_cost = ai_usage_cost + residual_cost + subscription
 # Net direct savings
 net_savings = baseline_human_cost - ai_enabled_cost
 
+# Monthly Cost Efficiency
+monthly_cost_efficiency = (baseline_human_cost / net_savings) * 100 if net_savings > 0 else float('inf')
+
 # Indirect savings (production uplift on full baseline)
 indirect_savings = baseline_human_cost * (production_pct/100) if include_indirect else 0
 
@@ -171,7 +174,7 @@ with c2:
 with c3:
     st.markdown(metric_block("Payback on Prod (mo)", payback_mo_prod, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
 with c4:
-    st.markdown(metric_block("$1 → Savings", dollar_return, "$", "", "{:,.2f}"), unsafe_allow_html=True)
+   st.markdown(metric_block("Monthly Cost Efficiency", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 
 st.markdown("---")
 
