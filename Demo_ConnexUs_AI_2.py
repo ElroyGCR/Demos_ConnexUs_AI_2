@@ -145,25 +145,23 @@ c4.markdown(metric_card("$1 → Savings", dollar_return, prefix="$", decimals=2)
 st.markdown("---")
 st.subheader("💰 Human vs Hybrid Cost Comparison")
 
-# Categories for the two bars
 cats = ["100% Human", "Hybrid"]
-
 fig = go.Figure()
 
-# 1) 100% Human bar (full baseline cost)
+# 1) 100% Human Cost bar
 fig.add_trace(go.Bar(
     name="100% Human Cost",
     x=cats,
     y=[baseline_human_cost, 0],
-    marker_color="#90CAF9"
+    marker_color="#90CAF9",
 ))
 
-# 2a) Hybrid: residual human cost (the un-automated portion)
+# 2a) Hybrid: residual human cost (the un-automated %)
 fig.add_trace(go.Bar(
     name=f"{int((1-automation_pct)*100)}% Human",
     x=cats,
     y=[0, residual_cost],
-    marker_color="#64B5F6"
+    marker_color="#64B5F6",
 ))
 
 # 2b) Hybrid: AI usage cost
@@ -171,15 +169,15 @@ fig.add_trace(go.Bar(
     name=f"{int(automation_pct*100)}% AI Usage",
     x=cats,
     y=[0, ai_cost],
-    marker_color="#1E88E5"
+    marker_color="#1E88E5",
 ))
 
-# 2c) Hybrid: Subscription
+# 2c) Hybrid: Subscription (flat monthly fee)
 fig.add_trace(go.Bar(
     name="Subscription",
     x=cats,
-    y=[0, subscription_cost],
-    marker_color="#FFA726"
+    y=[0, subscription],            # <-- use `subscription`, not `subscription_cost`
+    marker_color="#FFA726",
 ))
 
 fig.update_layout(
@@ -187,7 +185,7 @@ fig.update_layout(
     yaxis_title="Monthly Spend ($)",
     legend=dict(orientation="h", yanchor="bottom", y=1.02),
     margin=dict(t=40, b=20, l=40, r=20),
-    **TRANSPARENT  # your transparent‐background dict
+    **TRANSPARENT_LAYOUT       # your global transparent bg
 )
 
 st.plotly_chart(fig, use_container_width=True)
