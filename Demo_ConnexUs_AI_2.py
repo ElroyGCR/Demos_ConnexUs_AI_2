@@ -248,11 +248,13 @@ with right:
 
     # Net Savings
     st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
+st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
 
     # Indirect Savings
     if include_indirect:
         st.markdown(metric_block("Indirect Sav.", indirect_savings),
                     unsafe_allow_html=True)
+st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
 
     # HR Strategic
     if include_hr:
