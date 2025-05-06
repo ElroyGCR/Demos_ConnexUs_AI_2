@@ -247,7 +247,7 @@ with right:
         display: flex;
         flex-direction: column;
         row-gap: 10px;
-        margin-top: 40px;
+        margin-top: 60px;
     '>
       {metric_block("Net Savings",      net_savings)}
       {metric_block("Indirect Sav.",    indirect_savings) if include_indirect else ""}
