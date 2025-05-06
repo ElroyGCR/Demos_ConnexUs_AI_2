@@ -44,7 +44,7 @@ if wm:
     st.markdown(f"""
       <div style="
         position:fixed; top:50px; right:10%;
-        width:400px; height:400px; opacity:0.1;
+        width:800px; height:800px; opacity:0.1;
         background:url(data:image/png;base64,{wm}) no-repeat center/contain;
         pointer-events:none;
       "></div>
