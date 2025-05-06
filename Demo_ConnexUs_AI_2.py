@@ -164,15 +164,15 @@ st.markdown("---")
 # ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 st.markdown(
-    caption("Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."),
+    "<p style='text-align:center; font-size:16px; color:#aaa;'>"
+    "Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."
+    "</p>",
     unsafe_allow_html=True
 )
 
-# always calculate base return from net savings
-ai_spend     = subscription + ai_usage_cost
-base_return  = net_savings / ai_spend if ai_spend else 0.0
+ai_spend = subscription + ai_usage_cost
+base_return = net_savings / ai_spend if ai_spend else 0.0
 
-# then add the optional bits
 extra = 0.0
 if include_indirect:
     extra += indirect_savings / ai_spend
