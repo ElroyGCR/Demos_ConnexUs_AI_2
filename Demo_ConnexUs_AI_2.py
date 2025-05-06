@@ -159,26 +159,26 @@ st.markdown("---")
 # Core Metrics Row
 c1, c2, c3, c4 = st.columns(4)
 with c1:
-    st.markdown(metric_block("Net Monthly Savings", net_savings, prefix="$", suffix="", value_format="{:,.0f}"))
+    st.markdown(metric_block("Net Monthly Savings", net_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 with c2:
-    st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, prefix="", suffix="%", value_format="{:,.1f}"))
+    st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 with c3:
-    st.markdown(metric_block("Payback on Prod (mo)", payback_mo_prod, prefix="", suffix=" mo", value_format="{:,.2f}"))
+    st.markdown(metric_block("Payback on Prod (mo)", payback_mo_prod, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
 with c4:
-    st.markdown(metric_block("$1 → Savings", dollar_return, prefix="$"))
+    st.markdown(metric_block("$1 → Savings", dollar_return, "$", "", "{:,.2f}"), unsafe_allow_html=True)
 
 st.markdown("---")
 
 # Integration Metrics Row
 i1, i2, i3, i4 = st.columns(4)
 with i1:
-    st.markdown(metric_block("ROI on Integration (mo)", roi_integ_mo, prefix="", suffix="%", value_format="{:,.1f}"))
+    st.markdown(metric_block("ROI on Integration (mo)", roi_integ_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 with i2:
-    st.markdown(metric_block("ROI on Integration (yr)", roi_integ_yr, prefix="", suffix="%", value_format="{:,.1f}"))
+    st.markdown(metric_block("ROI on Integration (yr)", roi_integ_yr, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 with i3:
-    st.markdown(metric_block("Payback on Int (mo)", payback_mo_integ, prefix="", suffix=" mo", value_format="{:,.2f}"))
+    st.markdown(metric_block("Payback on Int (mo)", payback_mo_integ, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
 with i4:
-    st.markdown(metric_block("Value Basis", value_basis, prefix="$", suffix="", value_format="{:,.0f}"))
+    st.markdown(metric_block("Value Basis", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 
 st.markdown("---")
 
