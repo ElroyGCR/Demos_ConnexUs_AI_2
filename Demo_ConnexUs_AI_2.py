@@ -162,9 +162,10 @@ with i4:
 st.markdown("---")
 
 # ─── AI Investment Impact ─────────────────────────────────────────────
+# ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 
-# small explanatory line
+# little caption
 st.markdown(
     "<div style='color:#DDD; font-size:14px; margin-bottom:8px;'>"
     "Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."
@@ -184,7 +185,7 @@ if include_indirect:
 if include_hr:
     d_return += strategic_savings / ai_monthly_spend
 
-# render one big card
+# render one big card with divider
 st.markdown(
     f"""
     <div style='
@@ -194,12 +195,22 @@ st.markdown(
         margin-bottom:20px;
         text-align:center;
     '>
-      For every <span style='color:#FFD700; font-size:24px; font-weight:bold;'>$1</span> you invest in AI, you save:
-      <span style='color:#00FFAA; font-size:32px; font-weight:900;'>${d_return:.2f}</span>
+      <div style='font-size:20px; color:white;'>
+        For every <span style='color:#FFD700; font-size:28px; font-weight:bold;'>$1</span> you invest in AI, you save:
+      </div>
+
+      <!-- divider line -->
+      <hr style='border:none; border-top:1px solid #00FFAA; margin:12px 0; opacity:0.6;'/>
+
+      <div style='font-size:48px; color:#00FFAA; font-weight:900; margin-top:8px;'>
+        ${d_return:.2f}
+      </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
+
+st.markdown("---")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────────────────
 st.subheader("💰 Human vs Hybrid Cost Comparison")
