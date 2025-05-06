@@ -156,16 +156,11 @@ st.markdown("""
     </p>
 """, unsafe_allow_html=True)
 
+# AI spend (monthly)
 ai_spend = subscription + ai_usage_cost
-base_return = net_savings / ai_spend if ai_spend else 0.0
 
-extra = 0.0
-if include_indirect:
-    extra += indirect_savings / ai_spend
-if include_hr:
-    extra += strategic_savings / ai_spend
-
-dollar_return = base_return + extra
+# Return calculation based on Value Basis
+dollar_return = (value_basis / ai_spend) if ai_spend > 0 else 0
 
 st.markdown(f"""
 <div style='
@@ -200,7 +195,7 @@ fig1.add_trace(go.Bar(
 ))
 # Residual Human (Hybrid)
 fig1.add_trace(go.Bar(
-    name=f"{100-automation_pct}% Human",
+    name=f"{100 - automation_pct}% Human",
     x=cats, y=[0, residual_cost],
     marker_color="#64B5F6",
 ))
@@ -233,24 +228,35 @@ st.markdown("---")
 st.subheader("💸 Savings Breakdown")
 left, right = st.columns([3, 1], gap="large")
 
+# Left Chart
 with left:
     fig2 = go.Figure()
     
+    # Net
     fig2.add_trace(go.Bar(
         name="Net Savings",
-        x=["Savings"], y=[net_savings],
+        x=["Savings"],
+        y=[net_savings],
         marker_color="#66BB6A"
     ))
-    fig2.add_trace(go.Bar(
-        name="Indirect Sav.",
-        x=["Savings"], y=[indirect_savings if include_indirect else 0],
-        marker_color="#FFA726"
-    ))
-    fig2.add_trace(go.Bar(
-        name="HR Strategic",
-        x=["Savings"], y=[strategic_savings if include_hr else 0],
-        marker_color="#29B6F6"
-    ))
+    
+    # Indirect
+    if include_indirect:
+        fig2.add_trace(go.Bar(
+            name="Indirect Savings",
+            x=["Savings"],
+            y=[indirect_savings],
+            marker_color="#FFA726"
+        ))
+    
+    # HR Strategic
+    if include_hr:
+        fig2.add_trace(go.Bar(
+            name="HR Strategic Savings",
+            x=["Savings"],
+            y=[strategic_savings],
+            marker_color="#29B6F6"
+        ))
 
     fig2.update_layout(
         barmode='stack',
@@ -260,8 +266,10 @@ with left:
         margin=dict(t=30, b=30, l=0, r=0),
         **TRANSPARENT_LAYOUT
     )
+    
     st.plotly_chart(fig2, use_container_width=True)
 
+# Right Cards
 with right:
     html = f"""
     <div style='
@@ -271,7 +279,7 @@ with right:
         margin-top: 60px;
     '>
       {metric_block("Net Savings", net_savings, "$", "", "{:,.0f}")}
-      {metric_block("Indirect Sav.", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
+      {metric_block("Indirect Savings", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
       {metric_block("HR Strategic", strategic_savings, "$", "", "{:,.0f}") if include_hr else ""}
     </div>
     """
