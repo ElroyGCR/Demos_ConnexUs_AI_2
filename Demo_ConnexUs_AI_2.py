@@ -205,32 +205,34 @@ st.markdown("---")
 
 # ─── Savings Breakdown ───────────────────────────────────────────────
 st.subheader("💸 Savings Breakdown")
-left, right = st.columns([3,1], gap="large")
 
-# ─── Left: the stacked‐bar savings chart ─────────────────────────────
+# we want a wide left chart and a narrow right column of cards
+left, right = st.columns([3, 1], gap="large")
+
 with left:
     fig2 = go.Figure()
 
     # Net Savings
     fig2.add_trace(go.Bar(
         name="Net Savings",
-        x=["Savings"], y=[net_savings],
+        x=["Savings"],
+        y=[net_savings],
         marker_color="#66BB6A"
     ))
-
-    # Indirect Savings (only if toggled on)
+    # Indirect Savings (only if toggled)
     if include_indirect:
         fig2.add_trace(go.Bar(
             name="Indirect Sav.",
-            x=["Savings"], y=[indirect_savings],
+            x=["Savings"],
+            y=[indirect_savings],
             marker_color="#FFA726"
         ))
-
-    # HR Strategic Savings (only if toggled on)
+    # HR Strategic (only if toggled)
     if include_hr:
         fig2.add_trace(go.Bar(
             name="HR Strategic",
-            x=["Savings"], y=[strategic_savings],
+            x=["Savings"],
+            y=[strategic_savings],
             marker_color="#29B6F6"
         ))
 
@@ -244,26 +246,30 @@ with left:
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-
-# ─── Right: the three metric cards, in exact the same vertical spot they were before ────────────
 with right:
-    # add some blank space to push the cards down
-    st.markdown("<div style='margin-top:60px; display:flex; flex-direction:column; gap:15px;'>",
-        unsafe_allow_html=True)
+    # wrap all three cards in a flex column, push them down and space them out
+    st.markdown("""
+      <div style="
+         display: flex;
+         flex-direction: column;
+         justify-content: flex-start;
+         margin-top: 40px;      /* push the whole stack down a bit */
+         gap: 10px;             /* space between cards */
+      ">
+    """, unsafe_allow_html=True)
 
-    # Net Savings
-    st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
-    
-    # tiny spacer
-    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
-    
-    # Indirect Savings
+    # Net Savings card
+    st.markdown(metric_block("Net Savings", net_savings, prefix="$"), unsafe_allow_html=True)
+
+    # Indirect Savings card
     if include_indirect:
-        st.markdown(metric_block("Indirect Sav.", indirect_savings),
-                    unsafe_allow_html=True)
+        st.markdown(metric_block("Indirect Sav.", indirect_savings, prefix="$"), unsafe_allow_html=True)
 
-        # tiny spacer
-    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
+    # HR Strategic card
+    if include_hr:
+        st.markdown(metric_block("HR Strategic", strategic_savings, prefix="$"), unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
     
     # HR Strategic
     if include_hr:
