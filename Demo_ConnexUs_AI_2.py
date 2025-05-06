@@ -164,7 +164,7 @@ st.markdown("---")
 # ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 
-# little caption
+# helper caption
 st.markdown(
     "<div style='color:#DDD; font-size:14px; margin-bottom:8px;'>"
     "Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."
@@ -172,42 +172,56 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# compute total AI monthly spend
+# compute total AI spend (subscription + usage)
 ai_monthly_spend = subscription + ai_usage_cost
 
-# base return: net savings per dollar of AI spend
+# base return: net savings per dollar
 d_return = net_savings / ai_monthly_spend if ai_monthly_spend > 0 else 0.0
-
-# add optional indirect & HR strategic
+# add optional indirect & HR if toggled
 if include_indirect:
     d_return += indirect_savings / ai_monthly_spend
 if include_hr:
     d_return += strategic_savings / ai_monthly_spend
 
-# render one big card with divider
-st.markdown(
-    f"""
-    <div style='
-        border:2px solid #00FFAA;
-        border-radius:12px;
-        padding:20px;
-        margin-bottom:20px;
-        text-align:center;
-    '>
-      <div style='font-size:20px; color:white;'>
-        For every <span style='color:#FFD700; font-size:28px; font-weight:bold;'>$1</span> you invest in AI, you save:
-      </div>
+# render the big bordered container
+st.markdown(f"""
+<div style='
+    border: 2px solid #00FFAA;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: rgba(0,0,0,0.3);
+'>
+  <!-- top line -->
+  <div style='
+      text-align: center;
+      font-size: 20px;
+      color: white;
+  '>
+    For every <span style='color:#FFD700; font-size:28px; font-weight: bold;'>$1</span> you invest in AI, you save:
+  </div>
 
-      <!-- divider line -->
-      <hr style='border:none; border-top:1px solid #00FFAA; margin:12px 0; opacity:0.6;'/>
+  <!-- green divider -->
+  <hr style='
+      border: none;
+      border-top: 1px solid #00FFAA;
+      opacity: 0.6;
+      margin: 12px 0;
+  '/>
 
-      <div style='font-size:48px; color:#00FFAA; font-weight:900; margin-top:8px;'>
-        ${d_return:.2f}
-      </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+  <!-- big savings number -->
+  <div style='
+      text-align: center;
+      font-size: 48px;
+      color: #00FFAA;
+      font-weight: 900;
+  '>
+    ${d_return:.2f}
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("---")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────────────────
 st.subheader("💰 Human vs Hybrid Cost Comparison")
