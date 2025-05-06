@@ -24,20 +24,22 @@ if favicon_b64:
     )
 
 # ─── Global Styles & Watermark ────────────────────────────────────────
-st.markdown("""
+watermark_b64 = _load_base64("connexus_logo_watermark.png") 
+if watermark_b64:
+    st.markdown(f"""
     <style>
-      .block-container { padding-top: 1rem !important; }
-      .metric-card { 
-          background-color: rgba(0,0,0,0.25); /* more transparent background */
-          border: 2px solid #00FFAA;
-          border-radius: 12px; 
-          padding: 15px; 
-          text-align:center; 
-      }
-      .metric-label { color: #DDD; font-size:14px; }
-      .metric-value { color: #00FFAA; font-size: 32px; font-weight:bold; }
+    .watermark {{
+      position:fixed; top:80px; left:50%;
+      transform:translateX(-50%);
+      width:800px; height:800px;
+      opacity:0.15; z-index:0;
+      background:url("data:image/png;base64,{watermark_b64}") 
+                 no-repeat center/contain;
+      pointer-events:none;
+    }}
     </style>
-""", unsafe_allow_html=True)
+    <div class="watermark"></div>
+    """, unsafe_allow_html=True)
 
 wm = load_base64("connexus_logo_watermark.png")
 if wm:
