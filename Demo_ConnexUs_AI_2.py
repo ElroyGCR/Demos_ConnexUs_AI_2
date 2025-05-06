@@ -27,8 +27,13 @@ if favicon_b64:
 st.markdown("""
     <style>
       .block-container { padding-top: 1rem !important; }
-      .metric-card { background-color: rgba(0,0,0,0.5); border: 2px solid #00FFAA;
-                     border-radius: 12px; padding: 15px; text-align:center; }
+      .metric-card { 
+          background-color: rgba(0,0,0,0.25); /* more transparent background */
+          border: 2px solid #00FFAA;
+          border-radius: 12px; 
+          padding: 15px; 
+          text-align:center; 
+      }
       .metric-label { color: #DDD; font-size:14px; }
       .metric-value { color: #00FFAA; font-size: 32px; font-weight:bold; }
     </style>
