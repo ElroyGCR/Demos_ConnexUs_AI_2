@@ -27,7 +27,7 @@ if (f64 := load_base64("favicon-32x32.png")):
         unsafe_allow_html=True
     )
 
-# --- Transparent Plotly & CSS for Cards ---
+# --- CSS & Transparency ---
 st.markdown("""
 <style>
   .block-container { padding-top:0; }
@@ -41,6 +41,11 @@ st.markdown("""
   .savings-cards .metric-card:last-child { margin-top:auto; }
 </style>
 """, unsafe_allow_html=True)
+
+TRANSPARENT = dict(
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)"
+)
 
 # --- Watermark ---
 if (w64 := load_base64("connexus_logo_watermark.png")):
@@ -65,14 +70,8 @@ def card(label: str, val: str):
     </div>
     """
 
-TRANSPARENT = dict(
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)"
-)
-
 # --- Sidebar Inputs ---
 st.sidebar.header("🔧 Inputs")
-
 agents            = st.sidebar.number_input("Agents (FTE)", 1, 100, 25)
 hourly_rate       = st.sidebar.number_input("Human Hourly Rate ($)", 5.0, 50.0, 12.0)
 burden_pct        = st.sidebar.slider("Burden %", 0, 75, 35, step=5) / 100
@@ -98,7 +97,8 @@ fl_mult             = 1 + burden_pct
 total_human_hrs     = hrs_per_month * agents
 baseline_human      = total_human_hrs * hourly_rate * fl_mult
 
-talkable_minutes    = total_human_hrs * util_pct * 60
+# compute how many minutes are actually "talk"
+talkable_minutes    = total_human_hrs * 60 * util_pct
 ai_minutes          = automation_pct * talkable_minutes
 residual_minutes    = talkable_minutes - ai_minutes
 
@@ -106,32 +106,34 @@ ai_cost             = ai_minutes * ai_cost_min
 residual_cost       = (residual_minutes / 60) * hourly_rate * fl_mult
 total_ai_cost       = ai_cost + residual_cost + subscription
 
+# savings
 net_savings         = baseline_human - total_ai_cost
 indirect_savings    = net_savings * automation_pct if include_indirect else 0
-hr_savings          = baseline_human * hr_pct       if include_hr     else 0
+hr_savings          = baseline_human * hr_pct       if include_hr       else 0
 
-# $1 → savings
-dollar_return       = int((net_savings + indirect_savings + hr_savings) / (subscription + integration_fee))
+# $1 → savings (rounded whole dollars)
+dollar_return       = int((net_savings + indirect_savings + hr_savings) /
+                         (subscription + integration_fee or 1))
 
-# Production ROI & Payback
+# production ROI/payback
 value_prod          = net_savings + indirect_savings + hr_savings
-roi_prod_pct        = (value_prod / baseline_human) * 100
-payback_prod        = baseline_human / value_prod
+roi_prod_pct        = (value_prod / baseline_human) * 100 if baseline_human else 0
+payback_prod        = baseline_human / value_prod       if value_prod else float('inf')
 
-# Integration ROI & Payback
-roi_int_pct_mo      = (value_prod / integration_fee) * 100
+# integration ROI/payback
+roi_int_pct_mo      = (value_prod / integration_fee) * 100 if integration_fee else 0
 roi_int_pct_yr      = roi_int_pct_mo * 12
-payback_int_mo      = integration_fee / value_prod
+payback_int_mo      = integration_fee / value_prod       if value_prod else float('inf')
 value_basis         = value_prod
 
 # --- 1) Core Metrics ---
 st.markdown("---")
 st.subheader("📊 Core Financial Metrics")
 c1,c2,c3,c4 = st.columns(4, gap="large")
-c1.markdown(card("Net Monthly Savings", f"${baseline_human - total_ai_cost:,.0f}"), unsafe_allow_html=True)
-c2.markdown(card("ROI on Production (mo)", f"{roi_prod_pct:.1f}%"),       unsafe_allow_html=True)
-c3.markdown(card("Payback on Prod (mo)", f"{payback_prod:.1f} mo"),       unsafe_allow_html=True)
-c4.markdown(card("$1 → Savings", f"${dollar_return}"),                    unsafe_allow_html=True)
+c1.markdown(card("Net Monthly Savings",    f"${net_savings:,.0f}"), unsafe_allow_html=True)
+c2.markdown(card("ROI on Production (mo)", f"{roi_prod_pct:.1f}%"),  unsafe_allow_html=True)
+c3.markdown(card("Payback on Prod (mo)",   f"{payback_prod:.1f} mo"),unsafe_allow_html=True)
+c4.markdown(card("$1 → Savings",           f"${dollar_return}"),    unsafe_allow_html=True)
 
 # --- 2) AI Investment Impact ---
 st.markdown("---")
@@ -142,13 +144,15 @@ st.markdown(
     unsafe_allow_html=True
 )
 st.markdown(f"""
-<div class="metric-card" style="border-color:#00FFAA;">
-  <div class="metric-label">For every <span style="color:#FFD700; font-size:24px;">$1</span> you invest in AI, you save:</div>
+<div class="metric-card">
+  <div class="metric-label">
+    For every <span style="color:#FFD700;font-size:24px;">$1</span> you invest in AI, you save:
+  </div>
   <div class="metric-value" style="font-size:36px;">${dollar_return}</div>
 </div>
 """, unsafe_allow_html=True)
 
-# --- 3) Human vs Hybrid Cost ---
+# --- 3) Human vs Hybrid Cost Comparison ---
 st.markdown("---")
 st.subheader("💰 Human vs Hybrid Cost Comparison")
 fig = go.Figure()
@@ -160,18 +164,29 @@ fig.add_trace(go.Bar(
     y=[baseline_human, 0],
     marker_color="#90CAF9"
 ))
-# Hybrid split
+
+# Hybrid: residual human
 fig.add_trace(go.Bar(
     name=f"{int((1-automation_pct)*100)}% Human",
-    x=["100% Human", "Hybrid"],
+    x=["100% Human","Hybrid"],
     y=[0, residual_cost],
     marker_color="#64B5F6"
 ))
+
+# Hybrid: AI usage
 fig.add_trace(go.Bar(
-    name=f"{int(automation_pct*100)}% AI",
-    x=["100% Human", "Hybrid"],
-    y=[0, ai_cost + subscription],
+    name=f"{int(automation_pct*100)}% AI Usage",
+    x=["100% Human","Hybrid"],
+    y=[0, ai_cost],
     marker_color="#1E88E5"
+))
+
+# Hybrid: subscription
+fig.add_trace(go.Bar(
+    name="Subscription",
+    x=["100% Human","Hybrid"],
+    y=[0, subscription],
+    marker_color="#FFA726"
 ))
 
 fig.update_layout(
@@ -212,11 +227,11 @@ with left:
 
 with right:
     st.markdown("<div class='savings-cards'>", unsafe_allow_html=True)
-    st.markdown(card("Net Savings",    f"${net_savings:,.0f}"), unsafe_allow_html=True)
+    st.markdown(card("Net Savings",   f"${net_savings:,.0f}"),    unsafe_allow_html=True)
     if include_indirect:
-        st.markdown(card("Indirect Sav.",  f"${indirect_savings:,.0f}"), unsafe_allow_html=True)
+        st.markdown(card("Indirect Sav.", f"${indirect_savings:,.0f}"),unsafe_allow_html=True)
     if include_hr:
-        st.markdown(card("HR Strategic",  f"${hr_savings:,.0f}"), unsafe_allow_html=True)
+        st.markdown(card("HR Strategic", f"${hr_savings:,.0f}"),     unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # --- 5) Integration Metrics ---
