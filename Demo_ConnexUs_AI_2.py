@@ -138,26 +138,26 @@ st.markdown("---")
 # Core Metrics Row
 c1, c2, c3, c4 = st.columns(4)
 with c1:
-    st.markdown(metric_block("Net Monthly Savings", net_savings))
+    st.markdown(metric_block("Net Monthly Savings", net_savings), unsafe_allow_html=True)
 with c2:
-    st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, suffix="%"))
+    st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, suffix="%"), unsafe_allow_html=True)
 with c3:
-    st.markdown(metric_block("Payback on Prod (mo)", payback_mo_prod, suffix=" mo"))
+    st.markdown(metric_block("Payback on Prod (mo)", payback_mo_prod, suffix=" mo"), unsafe_allow_html=True)
 with c4:
-    st.markdown(metric_block("$1 → Savings", dollar_return, prefix="$"))
+    st.markdown(metric_block("$1 → Savings", dollar_return, prefix="$"), unsafe_allow_html=True)
 
 st.markdown("---")
 
 # Integration Metrics Row
 i1, i2, i3, i4 = st.columns(4)
 with i1:
-    st.markdown(metric_block("ROI on Integration (mo)", roi_integ_mo, suffix="%"))
+    st.markdown(metric_block("ROI on Integration (mo)", roi_integ_mo, suffix="%"), unsafe_allow_html=True)
 with i2:
-    st.markdown(metric_block("ROI on Integration (yr)", roi_integ_yr, suffix="%"))
+    st.markdown(metric_block("ROI on Integration (yr)", roi_integ_yr, suffix="%"), unsafe_allow_html=True)
 with i3:
-    st.markdown(metric_block("Payback on Int (mo)", payback_mo_integ, suffix=" mo"))
+    st.markdown(metric_block("Payback on Int (mo)", payback_mo_integ, suffix=" mo"), unsafe_allow_html=True)
 with i4:
-    st.markdown(metric_block("Value Basis", value_basis))
+    st.markdown(metric_block("Value Basis", value_basis), unsafe_allow_html=True)
 
 st.markdown("---")
 
