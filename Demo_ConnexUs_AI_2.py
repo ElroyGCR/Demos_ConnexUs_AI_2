@@ -41,17 +41,6 @@ if watermark_b64:
     <div class="watermark"></div>
     """, unsafe_allow_html=True)
 
-wm = load_base64("connexus_logo_watermark.png")
-if wm:
-    st.markdown(f"""
-      <div style="
-        position:fixed; top:50px; right:10%;
-        width:800px; height:800px; opacity:0.1;
-        background:url(data:image/png;base64,{wm}) no-repeat center/contain;
-        pointer-events:none;
-      "></div>
-    """, unsafe_allow_html=True)
-
 # ─── Helper Functions ──────────────────────────────────────────────────
 def metric_block(label, value, prefix="$", suffix=""):
     return f"""
