@@ -248,7 +248,8 @@ with left:
 # ─── Right: the three metric cards, in exact the same vertical spot they were before ────────────
 with right:
     # add some blank space to push the cards down
-    st.markdown("<div style='margin-top:60px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top:60px; display:flex; flex-direction:column; gap:15px;'>",
+        unsafe_allow_html=True)
 
     # Net Savings
     st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
