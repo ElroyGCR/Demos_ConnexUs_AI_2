@@ -162,60 +162,61 @@ with i4:
 st.markdown("---")
 
 # ─── AI Investment Impact ─────────────────────────────────────────────
-# ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
-
-# helper caption
-st.markdown(
-    "<div style='color:#DDD; font-size:14px; margin-bottom:8px;'>"
-    "Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."
-    "</div>",
-    unsafe_allow_html=True,
-)
 
 # compute total AI spend (subscription + usage)
 ai_monthly_spend = subscription + ai_usage_cost
 
-# base return: net savings per dollar
-d_return = net_savings / ai_monthly_spend if ai_monthly_spend > 0 else 0.0
-# add optional indirect & HR if toggled
+# base: net savings per $1 of AI spend
+d_return = net_savings / ai_monthly_spend if ai_monthly_spend>0 else 0.0
+# add optional indirect & HR
 if include_indirect:
     d_return += indirect_savings / ai_monthly_spend
 if include_hr:
     d_return += strategic_savings / ai_monthly_spend
 
-# render the big bordered container
+# render container
 st.markdown(f"""
 <div style='
-    border: 2px solid #00FFAA;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
+    border:2px solid #00FFAA;
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
     background-color: rgba(0,0,0,0.3);
 '>
-  <!-- top line -->
+  <!-- 1) caption line inside the box -->
   <div style='
-      text-align: center;
-      font-size: 20px;
-      color: white;
+      color:#DDD;
+      font-size:14px;
+      text-align:center;
+      margin-bottom:8px;
   '>
-    For every <span style='color:#FFD700; font-size:28px; font-weight: bold;'>$1</span> you invest in AI, you save:
+    Value returned for every $1 spent on AI subscription + usage.
   </div>
 
-  <!-- green divider -->
+  <!-- 2) lead-in line -->
+  <div style='
+      color:white;
+      font-size:18px;
+      text-align:center;
+  '>
+    For every <span style='color:#FFD700; font-size:22px; font-weight:bold;'>$1</span> you invest in AI, you save:
+  </div>
+
+  <!-- 3) thin green divider -->
   <hr style='
-      border: none;
-      border-top: 1px solid #00FFAA;
-      opacity: 0.6;
-      margin: 12px 0;
+      border:none;
+      border-top:1px solid #00FFAA;
+      opacity:0.6;
+      margin:12px 0;
   '/>
 
-  <!-- big savings number -->
+  <!-- 4) big savings number -->
   <div style='
-      text-align: center;
-      font-size: 48px;
-      color: #00FFAA;
-      font-weight: 900;
+      color:#00FFAA;
+      font-size:48px;
+      font-weight:900;
+      text-align:center;
   '>
     ${d_return:.2f}
   </div>
