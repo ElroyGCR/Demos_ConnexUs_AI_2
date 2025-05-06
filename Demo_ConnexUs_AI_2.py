@@ -81,6 +81,13 @@ def metric_block(label, value, prefix="", suffix="", value_format="{:,.2f}"):
     </div>
     """
 
+from decimal import Decimal, ROUND_HALF_UP
+
+def excel_round(val, decimals=1):
+    if val == float('inf') or val != val:  # catches inf and NaN
+        return float('inf')
+    return float(Decimal(val).quantize(Decimal('1.' + '0' * decimals), rounding=ROUND_HALF_UP))
+    
 TRANSPARENT_LAYOUT = dict(
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)'
@@ -138,7 +145,7 @@ ai_enabled_cost = ai_usage_cost + residual_cost + subscription
 net_savings = baseline_human_cost - ai_enabled_cost
 
 # Monthly Cost Efficiency
-monthly_cost_efficiency = (baseline_human_cost / net_savings) * 100 if net_savings > 0 else float('inf')
+monthly_cost_efficiency = excel_round((baseline_human_cost / net_savings) * 100, 1) if net_savings > 0 else float('inf')
 
 # Indirect savings (production uplift on full baseline)
 indirect_savings = baseline_human_cost * (production_pct/100) if include_indirect else 0
