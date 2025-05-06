@@ -54,7 +54,7 @@ st.markdown("""
     <style>
       .block-container { padding-top: 1rem !important; }
       .metric-card { 
-          background-color: rgba(0,0,0,0.5); 
+          background-color: rgba(0,0,0,0.25); 
           border: 2px solid #00FFAA;
           border-radius: 12px; 
           padding: 15px; 
