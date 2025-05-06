@@ -240,20 +240,23 @@ with left:
     st.plotly_chart(fig2, use_container_width=True)
 
 with right:
-    # first, push down to align with the chart
-    st.markdown("<div style='margin-top:60px;'></div>", unsafe_allow_html=True)
+    # push the whole column down so it lines up with the chart
+    st.markdown(
+        "<div style='margin-top:60px; display:flex; flex-direction:column; gap:15px;'>",
+        unsafe_allow_html=True,
+    )
 
     # Net Savings
     st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
 
-    # tiny spacer
-    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
-
     # Indirect Savings
     if include_indirect:
-        st.markdown(metric_block("Indirect Sav.", indirect_savings), unsafe_allow_html=True)
-        st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
+        st.markdown(metric_block("Indirect Sav.", indirect_savings),
+                    unsafe_allow_html=True)
 
     # HR Strategic
     if include_hr:
-        st.markdown(metric_block("HR Strategic", strategic_savings), unsafe_allow_html=True)
+        st.markdown(metric_block("HR Strategic", strategic_savings),
+                    unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
