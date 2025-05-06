@@ -6,7 +6,7 @@ import base64
 from decimal import Decimal, ROUND_HALF_UP
 
 # ─── Page Setup ────────────────────────────────────────
-st.set_page_config(page_title="ConnexUS AI ROI Calculator", layout="wide")
+st.set_page_config(page_title="ConnexUS AI ROI Calculator", layout="wide", page_icon="favicon.ico")
 
 # ─── Helper to load favicon and watermark ───────────────
 def load_base64(path):
@@ -155,7 +155,7 @@ col_icon1, col_text1 = st.columns([1, 20])
 with col_icon1:
     st.image("favicon-32x32.png", width=32)
 with col_text1:
-    st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">Metrics Overview</span>', unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 28px; font-weight: bold; vertical-align: middle;">Metrics Overview</span>', unsafe_allow_html=True)
 
 st.markdown("""
 <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
@@ -231,7 +231,7 @@ col_icon2, col_text2 = st.columns([1, 20])
 with col_icon2:
     st.image("favicon-32x32.png", width=32)
 with col_text2:
-    st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">AI Investment Impact</span>', unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 28px; font-weight: bold; vertical-align: middle;">AI Investment Impact</span>', unsafe_allow_html=True)
 
 # Added better explanatory text with consistent formatting
 st.markdown("""
@@ -284,7 +284,7 @@ if include_indirect:
     with col_icon3:
         st.image("favicon-32x32.png", width=32)
     with col_text3:
-        st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">Indirect Benefits</span>', unsafe_allow_html=True)
+        st.markdown('<span style="font-size: 28px; font-weight: bold; vertical-align: middle;">Indirect Benefits</span>', unsafe_allow_html=True)
         
     st.markdown("""
     <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
@@ -342,7 +342,7 @@ col_icon4, col_text4 = st.columns([1, 20])
 with col_icon4:
     st.image("favicon-32x32.png", width=32)
 with col_text4:
-    st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">Human vs Hybrid Cost Comparison</span>', unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 28px; font-weight: bold; vertical-align: middle;">Human vs Hybrid Cost Comparison</span>', unsafe_allow_html=True)
 
 # Added explanatory text with consistent formatting
 st.markdown("""
@@ -416,7 +416,7 @@ col_icon5, col_text5 = st.columns([1, 20])
 with col_icon5:
     st.image("favicon-32x32.png", width=32)
 with col_text5:
-    st.markdown('<span style="font-size: 24px; font-weight: bold; vertical-align: middle;">Savings Breakdown</span>', unsafe_allow_html=True)
+    st.markdown('<span style="font-size: 28px; font-weight: bold; vertical-align: middle;">Savings Breakdown</span>', unsafe_allow_html=True)
 
 # Added explanatory text with consistent formatting
 st.markdown("""
