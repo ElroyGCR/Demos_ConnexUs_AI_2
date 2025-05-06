@@ -247,15 +247,18 @@ with left:
 
 # ─── Right: the three metric cards, in exact the same vertical spot they were before ────────────
 with right:
-    # Net savings
+    # add some blank space to push the cards down
+    st.markdown("<div style='margin-top:60px;'></div>", unsafe_allow_html=True)
+
+    # Net Savings
     st.markdown(metric_block("Net Savings", net_savings), unsafe_allow_html=True)
 
-    # Indirect
+    # Indirect Savings
     if include_indirect:
         st.markdown(metric_block("Indirect Sav.", indirect_savings),
                     unsafe_allow_html=True)
 
-    # HR strategic
+    # HR Strategic
     if include_hr:
         st.markdown(metric_block("HR Strategic", strategic_savings),
                     unsafe_allow_html=True)
