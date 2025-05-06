@@ -164,59 +164,57 @@ st.markdown("---")
 # ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 
-# compute total AI spend (subscription + usage)
-ai_monthly_spend = subscription + ai_usage_cost
-
-# base: net savings per $1 of AI spend
-d_return = net_savings / ai_monthly_spend if ai_monthly_spend>0 else 0.0
-# add optional indirect & HR
+# calculate $1 return
+ai_spend = subscription + ai_usage_cost
+d_return = net_savings / ai_spend if ai_spend else 0.0
 if include_indirect:
-    d_return += indirect_savings / ai_monthly_spend
+    d_return += indirect_savings / ai_spend
 if include_hr:
-    d_return += strategic_savings / ai_monthly_spend
+    d_return += strategic_savings / ai_spend
 
-# render container
+# render
 st.markdown(f"""
 <div style='
     border:2px solid #00FFAA;
     border-radius:12px;
-    padding:20px;
-    margin-bottom:20px;
-    background-color: rgba(0,0,0,0.3);
+    padding:20px 0;
+    margin-bottom:2rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    background:rgba(0,0,0,0.25);
 '>
-  <!-- 1) caption line inside the box -->
+  <!-- caption -->
   <div style='
       color:#DDD;
       font-size:14px;
-      text-align:center;
       margin-bottom:8px;
   '>
     Value returned for every $1 spent on AI subscription + usage.
   </div>
 
-  <!-- 2) lead-in line -->
+  <!-- lead-in -->
   <div style='
       color:white;
       font-size:18px;
-      text-align:center;
+      margin-bottom:6px;
   '>
     For every <span style='color:#FFD700; font-size:22px; font-weight:bold;'>$1</span> you invest in AI, you save:
   </div>
 
-  <!-- 3) thin green divider -->
-  <hr style='
-      border:none;
+  <!-- divider -->
+  <div style='
+      width:90%;
       border-top:1px solid #00FFAA;
       opacity:0.6;
-      margin:12px 0;
-  '/>
+      margin:0 0 12px 0;
+  '></div>
 
-  <!-- 4) big savings number -->
+  <!-- big number -->
   <div style='
       color:#00FFAA;
       font-size:48px;
       font-weight:900;
-      text-align:center;
   '>
     ${d_return:.2f}
   </div>
