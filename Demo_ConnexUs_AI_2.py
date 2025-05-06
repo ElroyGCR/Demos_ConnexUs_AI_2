@@ -163,61 +163,36 @@ st.markdown("---")
 
 # ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
+st.markdown(
+    caption("Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."),
+    unsafe_allow_html=True
+)
 
-# calculate $1 return
+# compute $1 → savings (always use net savings; add indirect & HR only when toggled)
 ai_spend = subscription + ai_usage_cost
-d_return = net_savings / ai_spend if ai_spend else 0.0
+base_return = net_savings / ai_spend if ai_spend else 0.0
+extra_return = 0.0
 if include_indirect:
-    d_return += indirect_savings / ai_spend
+    extra_return += indirect_savings / ai_spend
 if include_hr:
-    d_return += strategic_savings / ai_spend
+    extra_return += strategic_savings / ai_spend
+dollar_return = base_return + extra_return
 
-# render
 st.markdown(f"""
 <div style='
-    border:2px solid #00FFAA;
-    border-radius:12px;
-    padding:20px 0;
-    margin-bottom:2rem;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    background:rgba(0,0,0,0.25);
+    background-color: rgba(0,0,0,0.25);
+    border: 2px solid #00FFAA;
+    border-radius: 12px;
+    padding: 20px 30px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    color: white;
+    font-size: 30px;
+    font-weight: 500;
+    text-align: center;
 '>
-  <!-- caption -->
-  <div style='
-      color:#DDD;
-      font-size:14px;
-      margin-bottom:8px;
-  '>
-    Value returned for every $1 spent on AI subscription + usage.
-  </div>
-
-  <!-- lead-in -->
-  <div style='
-      color:white;
-      font-size:18px;
-      margin-bottom:6px;
-  '>
-    For every <span style='color:#FFD700; font-size:22px; font-weight:bold;'>$1</span> you invest in AI, you save:
-  </div>
-
-  <!-- divider -->
-  <div style='
-      width:90%;
-      border-top:1px solid #00FFAA;
-      opacity:0.6;
-      margin:0 0 12px 0;
-  '></div>
-
-  <!-- big number -->
-  <div style='
-      color:#00FFAA;
-      font-size:48px;
-      font-weight:900;
-  '>
-    ${d_return:.2f}
-  </div>
+    For every <span style="color:#FFD700; font-size:46px; font-weight:800;">$1</span> you invest in AI, you save:
+    <span style="color:#00FFAA; font-size:50px; font-weight:900;">${dollar_return:,.2f}</span>
 </div>
 """, unsafe_allow_html=True)
 
