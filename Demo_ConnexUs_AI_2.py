@@ -41,7 +41,7 @@ if watermark_b64:
       position:fixed; top:10px; left:55%;
       transform:translateX(-50%);
       width:800px; height:800px;
-      opacity:0.15; z-index:0;
+      opacity:0.12; z-index:0;
       background:url("data:image/png;base64,{watermark_b64}") 
                  no-repeat center/contain;
       pointer-events:none;
