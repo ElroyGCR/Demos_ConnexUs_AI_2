@@ -253,6 +253,20 @@ with i4:
                              icon="favicon-16x16.png", prefix="$"),
                 unsafe_allow_html=True)
 
+# --- 3-Column Integration Metrics ---
+st.markdown("## 💼 Integration Basis Metrics")
+st.markdown(caption("Returns vs. one-time integration fee"))
+i1,i2,i3,i4 = st.columns(4)
+with i1:
+    st.markdown(metric_block("ROI Mo",     roi_integ_mo,     suffix="%"), unsafe_allow_html=True)
+with i2:
+    st.markdown(metric_block("ROI Yr",     roi_integ_mo*12,  suffix="%"), unsafe_allow_html=True)
+with i3:
+    st.markdown(metric_block("Payback Mo", payback_mo_int,  suffix=" mo"), unsafe_allow_html=True)
+with i4:
+    st.markdown(metric_block("Value Basis", value_basis,   prefix="$"), unsafe_allow_html=True)
+
+
 # --- Human vs Hybrid (partial AI) Cost Comparison ---
 st.markdown("## 💰 Human vs Hybrid Cost Comparison")
 
@@ -262,7 +276,7 @@ fig = go.Figure()
 fig.add_trace(go.Bar(
     name="100% Human Cost",
     x=["Cost"],
-    y=[baseline_human_cost],           # your full human baseline
+    y=[baseline_human_cost],
     marker_color="#90CAF9",
 ))
 
@@ -270,7 +284,7 @@ fig.add_trace(go.Bar(
 fig.add_trace(go.Bar(
     name=f"{100-automation_pct}% Human",
     x=["Cost"],
-    y=[residual_cost],                 # cost for the non‐automated portion
+    y=[residual_cost],
     marker_color="#64B5F6",
 ))
 
@@ -278,7 +292,7 @@ fig.add_trace(go.Bar(
 fig.add_trace(go.Bar(
     name=f"{automation_pct}% AI",
     x=["Cost"],
-    y=[ai_cost + subscription],        # AI minutes cost + full subscription
+    y=[ai_cost + subscription],
     marker_color="#1E88E5",
 ))
 
@@ -287,11 +301,8 @@ fig.update_layout(
     xaxis=dict(showticklabels=False),
     yaxis_title="Monthly Spend ($)",
     legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="right",
-        x=1
+        orientation="h", yanchor="bottom", y=1.02,
+        xanchor="right", x=1
     ),
     margin=dict(t=30, b=30, l=0, r=0),
     **TRANSPARENT_LAYOUT
@@ -301,9 +312,30 @@ st.plotly_chart(fig, use_container_width=True)
 
 
 # ─── Savings Breakdown ───────────────────────────────
+# helper for equal‐sized cards
+def equal_card(label, value, color="#00FFAA", border="#00FFAA", prefix="", suffix=""):
+    return f"""
+    <div style="
+        flex: 1;
+        width: 180px;
+        background-color: #111;
+        border: 2px solid {border};
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+    ">
+        <div style="color: white; font-size: 14px; margin-bottom: 5px;">{label}</div>
+        <div style="color: {color}; font-size: 32px; font-weight: bold;">
+            {prefix}{value:,.1f}{suffix}
+        </div>
+    </div>
+    """
+
 st.markdown("## 💸 Savings Breakdown")
 
-# two‐column: left = savings bar, right = metric cards
 left2, right2 = st.columns([3,1], gap="large")
 
 with left2:
@@ -315,7 +347,6 @@ with left2:
             marker_color="#66BB6A"
         )
     ])
-    # add indirect & strategic as stacked pieces if you like:
     if use_indirects:
         fig_save.add_trace(go.Bar(
             name="Indirect Sav.",
@@ -337,20 +368,33 @@ with left2:
         yaxis_title="Monthly Savings ($)",
         margin=dict(t=30, b=30, l=0, r=0),
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
-        **TRANSPARENT
+        **TRANSPARENT_LAYOUT
     )
     st.plotly_chart(fig_save, use_container_width=True)
 
 with right2:
-    # vertically stack your three cards
-    st.markdown("<div style='display:flex;flex-direction:column;gap:10px;'>",
-                unsafe_allow_html=True)
-    # Net Savings
-    st.markdown(metric_block("Net Savings", net_savings, prefix="$"), unsafe_allow_html=True)
-    # Indirect Savings (toggle)
+    # fixed‐height container matches chart height (e.g. 550px)
+    st.markdown(
+        """
+        <div style="
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            height: 550px;
+        ">
+        """
+        , unsafe_allow_html=True)
+
+    # always show Net Savings
+    st.markdown(equal_card("Net Savings",       net_savings,       prefix="$"), unsafe_allow_html=True)
+    # conditional cards
     if use_indirects:
-        st.markdown(metric_block("Indirect Sav.", indirect_savings, prefix="$"),
-                    unsafe_allow_html=True)
+        st.markdown(equal_card("Indirect Sav.",   indirect_savings,  prefix="$"), unsafe_allow_html=True)
+    if include_strategic:
+        st.markdown(equal_card("HR Strategic",    strategic_savings, prefix="$"), unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
     # Strategic HR Savings (toggle)
     if include_strategic:
         st.markdown(metric_block("HR Strategic", strategic_savings, prefix="$"),
