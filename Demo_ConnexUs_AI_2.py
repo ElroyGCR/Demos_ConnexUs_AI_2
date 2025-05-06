@@ -162,27 +162,32 @@ with i4:
 st.markdown("---")
 
 # ─── AI Investment Impact ─────────────────────────────────────────────
-st.markdown("## 💡 AI Investment Impact")
-st.markdown(caption("Value returned for every $1 spent on AI subscription + usage."), unsafe_allow_html=True)
+st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 
-# compute dollars invested (subscription + pure usage)
+# explanation line
+st.markdown(
+    "<div style='color:#DDD; font-size:14px; margin-bottom:8px;'>"
+    "Value returned for every $1 spent on AI subscription + usage."
+    "</div>",
+    unsafe_allow_html=True,
+)
+
+# compute how much you invest
 ai_monthly_spend = subscription + ai_usage_cost
 
-# base return is net savings per dollar invested
-d_return = net_savings / ai_monthly_spend if ai_monthly_spend>0 else 0
+# base return: net savings per dollar invested
+d_return = net_savings / ai_monthly_spend if ai_monthly_spend > 0 else 0
 
-# add indirect return if toggled
+# include indirect & HR if toggled
 if include_indirect:
     d_return += indirect_savings / ai_monthly_spend
-
-# add HR strategic return if toggled
 if include_hr:
     d_return += strategic_savings / ai_monthly_spend
 
-# render the single metric card
+# render the single “$1 → Savings” metric card
 st.markdown(
     metric_block("$1 → Savings", d_return, prefix="$"),
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────────────────
