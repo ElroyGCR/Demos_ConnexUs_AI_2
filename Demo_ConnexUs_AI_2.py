@@ -128,10 +128,10 @@ burden_mul = 1 + burden_pct/100
 baseline_human_cost = agents * hours_per_month * human_rate * burden_mul
 
 # Monthly talk minutes (only the utilized portion)
-monthly_talk_mins = agents * hours_per_month * (talk_pct/100) * 60
+monthly_total_mins = agents * hours_per_month * 60
 
 # AI usage cost
-ai_mins      = (automation_pct/100) * monthly_talk_mins
+ai_mins = (automation_pct/100) * monthly_total_mins
 ai_usage_cost = ai_mins * ai_cost_min
 
 # Residual human cost (the portion you didn't automate)
