@@ -164,29 +164,40 @@ st.markdown("---")
 # ─── AI Investment Impact ─────────────────────────────────────────────
 st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
 
-# explanation line
+# small explanatory line
 st.markdown(
     "<div style='color:#DDD; font-size:14px; margin-bottom:8px;'>"
-    "Value returned for every $1 spent on AI subscription + usage."
+    "Shows how much value is returned for every dollar spent on AI — includes cost savings and indirect gains."
     "</div>",
     unsafe_allow_html=True,
 )
 
-# compute how much you invest
+# compute total AI monthly spend
 ai_monthly_spend = subscription + ai_usage_cost
 
-# base return: net savings per dollar invested
-d_return = net_savings / ai_monthly_spend if ai_monthly_spend > 0 else 0
+# base return: net savings per dollar of AI spend
+d_return = net_savings / ai_monthly_spend if ai_monthly_spend > 0 else 0.0
 
-# include indirect & HR if toggled
+# add optional indirect & HR strategic
 if include_indirect:
     d_return += indirect_savings / ai_monthly_spend
 if include_hr:
     d_return += strategic_savings / ai_monthly_spend
 
-# render the single “$1 → Savings” metric card
+# render one big card
 st.markdown(
-    metric_block("$1 → Savings", d_return, prefix="$"),
+    f"""
+    <div style='
+        border:2px solid #00FFAA;
+        border-radius:12px;
+        padding:20px;
+        margin-bottom:20px;
+        text-align:center;
+    '>
+      For every <span style='color:#FFD700; font-size:24px; font-weight:bold;'>$1</span> you invest in AI, you save:
+      <span style='color:#00FFAA; font-size:32px; font-weight:900;'>${d_return:.2f}</span>
+    </div>
+    """,
     unsafe_allow_html=True,
 )
 
