@@ -255,35 +255,62 @@ st.markdown(f"""
 
 st.markdown("---")
 
-# ─── UI: Human vs Hybrid Cost Comparison ────────────
+# ─── Human vs Hybrid Cost Comparison ───────────────────────────────
 st.markdown("## 💰 Human vs Hybrid Cost Comparison")
+
 fig = go.Figure()
+
+# Define our two x‐axis categories
+cats = ["100% Human", "Hybrid"]
+
+# 1) 100% Human bar (baseline)
 fig.add_trace(go.Bar(
     name="100% Human Cost",
-    x=["Cost"], y=[baseline_human_cost],
-    marker_color="#90CAF9"
+    x=cats,
+    y=[baseline_human_cost, 0],           # full cost in first column only
+    marker_color="#90CAF9",
 ))
+
+# 2) Hybrid: residual human cost (the % you didn’t automate)
 fig.add_trace(go.Bar(
     name=f"{100-automation_pct}% Human",
-    x=["Cost"], y=[residual_cost],
-    marker_color="#64B5F6"
+    x=cats,
+    y=[0, residual_cost],                  # only in second column
+    marker_color="#64B5F6",
 ))
+
+# 3) Hybrid: AI Usage cost
 fig.add_trace(go.Bar(
-    name=f"{automation_pct}% AI",
-    x=["Cost"], y=[ai_cost+subscription],
-    marker_color="#1E88E5"
+    name=f"{automation_pct}% AI Usage",
+    x=cats,
+    y=[0, ai_cost],                        # only in second column
+    marker_color="#1E88E5",
 ))
+
+# 4) Hybrid: Subscription fee
+fig.add_trace(go.Bar(
+    name="Subscription",
+    x=cats,
+    y=[0, subscription],                   # only in second column
+    marker_color="#FFAB91",
+))
+
 fig.update_layout(
     barmode="stack",
-    xaxis=dict(showticklabels=False),
+    xaxis_title="",
     yaxis_title="Monthly Spend ($)",
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ),
     margin=dict(t=30, b=30, l=0, r=0),
     **TRANSPARENT_LAYOUT
 )
-st.plotly_chart(fig, use_container_width=True)
 
-st.markdown("---")
+st.plotly_chart(fig, use_container_width=True)
 
 # ─── UI: Savings Breakdown ──────────────────────────
 st.markdown("## 💸 Savings Breakdown")
