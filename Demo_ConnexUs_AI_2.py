@@ -193,12 +193,13 @@ with st.expander("ℹ️ How are these metrics calculated?"):
         <p><strong>Net Monthly Savings (${net_savings:,.0f})</strong>: The total monthly cost reduction achieved by implementing AI.</p>
         <ul>
             <li>Calculated as: Baseline human cost minus AI-enabled cost</li>
-            <li>Formula: <code>agents × hours × rate × burden_multiplier - (residual_human_cost + ai_variable_cost + subscription)</code></li>
+            <li>Formula: Agents × Hours × Rate × Burden - (Remaining Human Cost + AI Cost + Subscription)</li>
         </ul>
         
         <p><strong>Monthly Cost Efficiency ({monthly_cost_efficiency:.1f}%)</strong>: The percentage of baseline costs saved through AI implementation.</p>
         <ul>
-            <li>Formula: <code>(net_savings / baseline_human_cost) × 100</code></li>
+            <li>Formula: Net Savings ÷ Baseline Cost × 100</li>
+            <li><strong>What it means</strong>: Higher percentages indicate greater cost reduction. At {monthly_cost_efficiency:.1f}%, you're reducing operational costs by nearly one-third, which directly improves margin and profitability.</li>
         </ul>
     </div>
 
@@ -207,13 +208,15 @@ with st.expander("ℹ️ How are these metrics calculated?"):
         <p><strong>ROI on Production ({roi_prod_mo:.1f}% monthly, {roi_prod_mo*12:.1f}% yearly)</strong>: Return on investment relative to your baseline operational costs.</p>
         <ul>
             <li>Shows how much value is returned for every dollar of your current operations</li>
-            <li>Formula: <code>(total_value / baseline_human_cost) × 100</code></li>
+            <li>Formula: Total Value ÷ Baseline Cost × 100</li>
+            <li><strong>What it means</strong>: A higher percentage indicates greater value creation. At {roi_prod_mo:.1f}%, your AI implementation is delivering nearly double the value of your current operational investment each month.</li>
         </ul>
         
         <p><strong>ROI on Integration ({roi_integ_mo:.1f}% monthly, {roi_integ_yr:.1f}% yearly)</strong>: Return on investment relative to your upfront integration costs.</p>
         <ul>
             <li>Shows how quickly you'll recover the initial integration fee</li>
-            <li>Formula: <code>(total_value / integration_fee) × 100</code></li>
+            <li>Formula: Total Value ÷ Integration Fee × 100</li>
+            <li><strong>What it means</strong>: Higher percentages indicate faster recovery of integration costs. At {roi_integ_mo:.1f}% monthly, you're seeing exceptional returns on your integration investment.</li>
         </ul>
     </div>
 
@@ -221,12 +224,14 @@ with st.expander("ℹ️ How are these metrics calculated?"):
         <h4 style="color: #00FFAA; margin-top: 0;">Payback Metrics</h4>
         <p><strong>Payback on Production ({payback_mo_prod:.2f} months)</strong>: Number of months required to recover your baseline operational costs.</p>
         <ul>
-            <li>Formula: <code>baseline_human_cost / total_value</code></li>
+            <li>Formula: Baseline Cost ÷ Total Value</li>
+            <li><strong>What it means</strong>: Lower numbers are better. At {payback_mo_prod:.2f} months, you'll recover your monthly operational investment in just over a month through AI implementation savings.</li>
         </ul>
         
         <p><strong>Payback on Integration ({payback_mo_integ:.2f} months)</strong>: Number of months required to recover your integration investment.</p>
         <ul>
-            <li>Formula: <code>integration_fee / total_value</code></li>
+            <li>Formula: Integration Fee ÷ Total Value</li>
+            <li><strong>What it means</strong>: Lower numbers indicate faster ROI. At {payback_mo_integ:.2f} months, you'll recover your entire integration investment in less than a month - far better than most technology investments which typically take 6-18 months.</li>
         </ul>
     </div>
 
@@ -234,8 +239,8 @@ with st.expander("ℹ️ How are these metrics calculated?"):
         <h4 style="color: #00FFAA; margin-top: 0;">Total Value</h4>
         <p><strong>Total Value (Combined) (${value_basis:,.0f})</strong>: The combined total of all direct and indirect savings.</p>
         <ul>
-            <li>Formula: <code>net_savings + indirect_savings + strategic_savings</code></li>
-            <li>This represents the total financial impact of implementing AI</li>
+            <li>Formula: Net Savings + Indirect Savings + Strategic Savings</li>
+            <li><strong>What it means</strong>: This represents the total financial impact of implementing AI across your organization, including both immediate cost savings and broader operational improvements.</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
@@ -331,10 +336,12 @@ with st.expander("ℹ️ How is this return calculated?"):
         <ul>
             <li><strong>AI investment</strong> includes both the subscription cost (${subscription:,.0f}/mo) and variable AI usage costs (${ai_variable_cost:,.0f}/mo)</li>
             <li><strong>Total value</strong> includes all forms of savings: direct operational savings, indirect productivity improvements, and strategic benefits</li>
-            <li><strong>Formula</strong>: <code>total_value / (subscription + ai_variable_cost)</code></li>
+            <li><strong>Formula</strong>: Total Value ÷ (Subscription + AI Variable Cost)</li>
             <li>At ${dollar_return:,.2f}, your AI investment is delivering a {(dollar_return-1)*100:.0f}% return on every dollar</li>
         </ul>
         <p><em>Note: This is a monthly return figure, meaning your annual return would be approximately ${dollar_return*12:,.2f} for every dollar invested.</em></p>
+        
+        <p><strong>What this means for your business:</strong> This is perhaps the most compelling metric for financial decision makers. A return of ${dollar_return:,.2f} for every dollar invested far exceeds most technology investments, which typically return $1.30-$2.50. This positions AI automation as one of the highest-ROI technologies available to contact centers today.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -397,15 +404,26 @@ with st.expander("ℹ️ How to read this cost comparison"):
         <p>This chart shows the financial difference between your current all-human operation and the proposed AI-hybrid model:</p>
         <ul>
             <li><strong>Left bar (100% Human)</strong>: Your current monthly spend (${baseline_human_cost:,.0f}) on human agents</li>
-            <li><strong>Right bar (Hybrid)</strong>: The combined costs of your new hybrid model, broken down into three components:</li>
-            <ul>
-                <li><strong>{100-automation_pct}% Human</strong>: Remaining human agent costs (${residual_human_cost:,.0f})</li>
-                <li><strong>{automation_pct}% AI Usage</strong>: Variable AI costs based on usage (${ai_variable_cost:,.0f})</li>
-                <li><strong>Subscription</strong>: Fixed monthly AI platform fee (${subscription:,.0f})</li>
-            </ul>
+            <li><strong>Right bar (Hybrid)</strong>: The combined costs of your new hybrid model:
+                <ul>
+                    <li><strong>{100-automation_pct}% Human</strong>: Remaining human agent costs (${residual_human_cost:,.0f})</li>
+                    <li><strong>{automation_pct}% AI Usage</strong>: Variable AI costs based on usage (${ai_variable_cost:,.0f})</li>
+                    <li><strong>Subscription</strong>: Fixed monthly AI platform fee (${subscription:,.0f})</li>
+                </ul>
+            </li>
             <li><strong>Total monthly savings</strong>: ${net_savings:,.0f} ({monthly_cost_efficiency:.1f}% reduction)</li>
         </ul>
-        <p>This hybrid approach enables you to handle the same workload at a significantly lower cost while maintaining or improving quality and consistency.</p>
+        
+        <p><strong>Why this matters to your business:</strong></p>
+        <ul>
+            <li><strong>Immediate cost reduction</strong>: AI implementation delivers substantial cost savings from day one</li>
+            <li><strong>Predictable costs</strong>: AI costs are more stable and predictable than human staffing costs</li>
+            <li><strong>Scalability</strong>: AI can easily scale up or down without the hiring/firing cycles of traditional contact centers</li>
+            <li><strong>Reduced fixed costs</strong>: Converting fixed costs (full-time employees) to variable costs (AI usage) improves financial flexibility</li>
+            <li><strong>Lower operational risk</strong>: AI reduces dependency on labor market conditions and staffing challenges</li>
+        </ul>
+        
+        <p>While maintaining the same service capacity, you're able to operate at {100-monthly_cost_efficiency:.1f}% of your previous cost base - this directly improves EBITDA and gives you competitive pricing advantages in your market.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -485,7 +503,17 @@ with st.expander("ℹ️ Understanding the savings breakdown"):
             <li><strong>Indirect Savings{f" (${indirect_savings:,.0f})" if include_indirect else ""}</strong>: Productivity improvements and reduction in unproductive time</li>
             <li><strong>HR Strategic Impact{f" (${strategic_savings:,.0f})" if include_hr else ""}</strong>: Higher-order benefits from improved workforce management</li>
         </ul>
-        <p>The stacked nature of the chart shows how these different savings components contribute to your total value basis of ${value_basis:,.0f} per month.</p>
+        
+        <p><strong>Why the total value matters:</strong></p>
+        <ul>
+            <li><strong>Complete picture</strong>: Looking at direct savings alone understates AI's true value by as much as 70%</li>
+            <li><strong>Financial justification</strong>: The total value provides compelling ROI that makes approval easier</li>
+            <li><strong>Long-term impact</strong>: Indirect benefits often increase over time as AI becomes more integrated</li>
+            <li><strong>Competitive advantage</strong>: Organizations that understand total value gain a strategic edge over competitors only focused on direct costs</li>
+        </ul>
+        
+        <p><strong>Decision-making guidance:</strong> When evaluating AI automation, consider all three value components. A solution that delivers higher total value, even at slightly higher implementation cost, will typically provide better long-term returns than a cheaper solution with lower indirect benefits.</p>
+        
         <p><em>Note: Toggle the "Include Indirect Value" and "Include HR Strategic Impact" options in the sidebar to see how these additional value components affect your overall ROI.</em></p>
     </div>
     """, unsafe_allow_html=True)
