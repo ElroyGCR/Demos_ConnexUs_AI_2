@@ -50,6 +50,21 @@ if watermark_b64:
     <div class="watermark"></div>
     """, unsafe_allow_html=True)
 
+st.markdown("""
+    <style>
+      .block-container { padding-top: 1rem !important; }
+      .metric-card { 
+          background-color: rgba(0,0,0,0.5); 
+          border: 2px solid #00FFAA;
+          border-radius: 12px; 
+          padding: 15px; 
+          text-align:center; 
+      }
+      .metric-label { color: #DDD; font-size:14px; }
+      .metric-value { color: #00FFAA; font-size: 32px; font-weight:bold; }
+    </style>
+""", unsafe_allow_html=True)
+
 # ─── Helper Functions ──────────────────────────────────────────────────
 def metric_block(label, value, prefix="$", suffix=""):
     return f"""
