@@ -87,9 +87,9 @@ def calculate_metrics(
 # ─── Styles ────────────────────────────────────────────
 st.markdown("""
 <style>
-  .banner { background-color: #E0F7FA; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
-  .result-card { background-color: #F1F8E9; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-  .tooltip { cursor: help; color: #0288D1; margin-left: 5px; }
+  .banner { background-color: #1E1E1E; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; border: 1px solid #333; color: white; }
+  .result-card { background-color: #1E1E1E; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; color: white; }
+  .tooltip { cursor: help; color: #4db6ac; margin-left: 5px; }
   .stApp {
     background-color: #0f1116;
     color: #ffffff;
@@ -168,8 +168,8 @@ with graph_col:
         banner_pay = f"{payback:.1f}" if math.isfinite(payback) and payback is not None else "N/A"
 
         st.markdown(f"""
-        <div class='banner'>
-          <h2>You'll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
+        <div class='banner' style="background-color: #1E1E1E; border: 1px solid #333; color: white;">
+          <h2>You'll save <span style='color:#4CAF50;'>{banner_net}</span> each month!</h2>
           <p>For every $1 you spend on AI, you get {banner_ret} back.</p>
           <p>You'll get your setup money back in {banner_pay} months.</p>
         </div>
@@ -178,7 +178,7 @@ with graph_col:
         st.error(f"Error displaying banner: {str(e)}")
         # Show a simpler banner as fallback
         st.markdown("""
-        <div class='banner'>
+        <div class='banner' style="background-color: #1E1E1E; border: 1px solid #333; color: white;">
           <h2>Calculate your AI savings above</h2>
           <p>Adjust the values on the left to see your potential savings.</p>
         </div>
