@@ -7,25 +7,24 @@ import sys
 import os
 import math
 
-# Attempt to import Streamlit
+# Attempt to import Streamlit and other required libraries
 try:
     import streamlit as st
-except ImportError:
+    import plotly.graph_objects as go
+    import plotly.express as px
+    import pandas as pd
+    import numpy as np
+except ImportError as e:
     sys.exit(
-        "Error: Streamlit module not found.\n"
-        "Please install Streamlit by running 'pip install streamlit' in your environment."
+        f"Error: Required module not found: {e.name}\n"
+        f"Please install it by running 'pip install {e.name}' in your environment."
     )
 
 # ─── Page Setup ────────────────────────────────────────
 # IMPORTANT: st.set_page_config must be the first Streamlit command
 st.set_page_config(page_title="AI Savings Calculator", layout="wide", page_icon="💰")
 
-# Get branding inputs (these can't affect page config now)
-brand_title = st.sidebar.text_input("App Title", value="AI Savings Calculator")
-brand_icon = st.sidebar.text_input("App Icon (emoji)", value="💰")
-
 # ─── Calculation Logic ─────────────────────────────────
-
 def calculate_metrics(
     agents: int,
     human_rate: float,
@@ -85,51 +84,36 @@ def calculate_metrics(
         'return_per_dollar': return_per,
     }
 
-# ─── Banner Rendering ──────────────────────────────────
-
-def render_banner(metrics: dict):
-    """
-    Display the main savings banner with checks for invalid values.
-    """
-    net = metrics.get('net_savings', float('nan'))
-    ret = metrics.get('return_per_dollar', float('nan'))
-    payback = metrics.get('payback_mo_integ', float('nan'))
-
-    # Format the values carefully to avoid f-string confusion
-    if math.isfinite(net):
-        banner_net = f"${int(net):,}"
-    else:
-        banner_net = "N/A"
-        
-    banner_ret = f"{ret:,.2f}" if math.isfinite(ret) else "N/A"
-    banner_pay = f"{payback:.1f}" if math.isfinite(payback) else "N/A"
-
-    st.markdown(f"""
-    <div class='banner'>
-      <h2>You'll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
-      <p>For every $1 you spend on AI, you get {banner_ret} back.</p>
-      <p>You'll get your setup money back in {banner_pay} months.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
 # ─── Styles ────────────────────────────────────────────
 st.markdown("""
 <style>
-  .banner { background-color: #E0F7FA; padding: 20px; border-radius: 10px; text-align: center; }
+  .banner { background-color: #E0F7FA; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
   .result-card { background-color: #F1F8E9; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
   .tooltip { cursor: help; color: #0288D1; margin-left: 5px; }
+  .stApp {
+    background-color: #0f1116;
+    color: #ffffff;
+  }
+  .css-145kmo2 {
+    color: #ffffff;
+  }
 </style>
 """, unsafe_allow_html=True)
 
-# ─── Example Story ─────────────────────────────────────
+# ─── Main App Layout ─────────────────────────────────────
+st.title("AI Savings Calculator")
+
+# Example Story 
 st.markdown("""
 > **Meet Alex.** Alex has 10 people who each work 160 hours a month at $20/hour. By letting AI help with 40% of the work,
 > Alex keeps an extra $8,000 each month and gets the $10,000 setup fee back in just 3 months!
 """)
 st.markdown("---")
 
-# ─── Inputs & Results Layout ─────────────────────────────
-input_col, result_col = st.columns([1, 1])
+# Create two columns for layout
+input_col, graph_col = st.columns([1, 2])
+
+# ─── Input Panel (Left Column) ─────────────────────────────
 with input_col:
     st.header("Your Information")
     agents = st.number_input("Number of People", min_value=1, value=10, step=1)
@@ -147,8 +131,9 @@ with input_col:
     include_indirect = st.checkbox("Include Extra Savings (fewer mistakes, happier staff)", value=True)
     hr_pct = st.slider("Extra Savings: What percent to count?", 0, 100, 10, step=5) if include_indirect else 0
 
-with result_col:
-    st.header("Your Results")
+# ─── Results and Graphs (Right Column) ─────────────────────
+with graph_col:
+    # Calculate metrics
     metrics = calculate_metrics(
         agents=agents,
         human_rate=human_rate,
@@ -161,27 +146,198 @@ with result_col:
         include_indirect=include_indirect,
         hr_pct=hr_pct,
     )
+    
+    # Display the main banner
+    net = metrics.get('net_savings', float('nan'))
+    ret = metrics.get('return_per_dollar', float('nan'))
+    payback = metrics.get('payback_mo_integ', float('nan'))
+    
+    # Format the values carefully to avoid f-string confusion
+    if math.isfinite(net):
+        banner_net = f"${int(net):,}"
+    else:
+        banner_net = "N/A"
+        
+    banner_ret = f"{ret:,.2f}" if math.isfinite(ret) else "N/A"
+    banner_pay = f"{payback:.1f}" if math.isfinite(payback) else "N/A"
 
-    # Render banner via helper
-    render_banner(metrics)
+    st.markdown(f"""
+    <div class='banner'>
+      <h2>You'll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
+      <p>For every $1 you spend on AI, you get {banner_ret} back.</p>
+      <p>You'll get your setup money back in {banner_pay} months.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # Detailed cards
-    for label, key, tooltip in [
-        ("Money You Keep Each Month", 'net_savings',
-         "This is how much extra cash stays in your bank every month."),
-        ("Return per Dollar", 'return_per_dollar',
-         "For every dollar you pay AI, you get this many dollars back in savings."),
-        ("Months to Pay Back Setup", 'payback_mo_integ',
-         "How many months until your one-time fee is earned back."),
-    ]:
-        value = metrics.get(key, float('nan'))
-        display = f"{value:,.2f}" if isinstance(value, float) and math.isfinite(value) else (f"{int(value):,}" if isinstance(value, (int, float)) and math.isfinite(value) else "N/A")
-        st.markdown(f"""
-        <div class='result-card'>
-          <b>{label}</b> <span class='tooltip' title='{tooltip}'>ℹ️</span><br>
-          <span style='font-size:24px;'>{display}</span>
-        </div>
-        """, unsafe_allow_html=True)
+    # ─── GRAPH 1: Cost Comparison Bar Chart ─────────────────
+    st.subheader("Monthly Cost Comparison")
+    
+    fig_cost = go.Figure()
+    fig_cost.add_trace(go.Bar(
+        x=['Current Human Cost', 'AI-Enabled Cost', 'Net Savings'],
+        y=[metrics['baseline_human_cost'], metrics['ai_enabled_cost'], metrics['net_savings']],
+        marker_color=['#ff9e80', '#80cbc4', '#2E7D32']
+    ))
+    fig_cost.update_layout(
+        xaxis_title="Cost Category",
+        yaxis_title="Amount ($)",
+        yaxis_tickprefix="$",
+        plot_bgcolor='rgba(0,0,0,0.1)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        height=300,
+        margin=dict(l=40, r=40, t=30, b=40),
+    )
+    st.plotly_chart(fig_cost, use_container_width=True)
+    
+    # ─── GRAPH 2: ROI Timeline Graph ─────────────────
+    st.subheader("Return on Investment Over Time")
+    
+    # Generate timeline data for 24 months
+    months = list(range(1, 25))
+    
+    # Calculate cumulative savings
+    monthly_value = metrics['total_value']
+    initial_cost = -metrics['integration_fee']
+    cumulative = [initial_cost + (monthly_value * i) for i in months]
+    
+    # Create dataframe for the line chart
+    roi_data = pd.DataFrame({
+        'Month': months,
+        'Cumulative Value': cumulative
+    })
+    
+    # Find break-even point
+    breakeven_month = next((i for i, val in enumerate(cumulative) if val >= 0), None)
+    
+    # Create the ROI timeline chart
+    fig_roi = px.line(
+        roi_data, 
+        x='Month', 
+        y='Cumulative Value',
+        markers=True,
+    )
+    
+    # Add break-even point marker
+    if breakeven_month is not None:
+        fig_roi.add_trace(
+            go.Scatter(
+                x=[breakeven_month + 1], 
+                y=[cumulative[breakeven_month]],
+                mode='markers',
+                marker=dict(size=12, color='#76ff03', line=dict(width=2, color='white')),
+                name='Break-even Point'
+            )
+        )
+    
+    # Add horizontal line at y=0
+    fig_roi.add_shape(
+        type="line", line_color="gray", line_dash="dash",
+        x0=0, x1=24, y0=0, y1=0
+    )
+    
+    fig_roi.update_layout(
+        xaxis_title="Month",
+        yaxis_title="Cumulative Value ($)",
+        yaxis_tickprefix="$",
+        plot_bgcolor='rgba(0,0,0,0.1)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        height=300,
+        margin=dict(l=40, r=40, t=30, b=40),
+    )
+    st.plotly_chart(fig_roi, use_container_width=True)
+    
+    # Create two columns for smaller charts
+    col1, col2 = st.columns(2)
+    
+    # ─── GRAPH 3: Cost Breakdown Pie Charts ─────────────────
+    with col1:
+        st.subheader("Cost Distribution")
+        
+        # Data for the pie charts
+        human_costs = [
+            metrics['residual_human_cost'],  # Human cost that remains
+            metrics['productive_cost'] * (automation_pct / 100),  # Human cost replaced by AI
+            metrics['unproductive_cost']  # Unproductive time
+        ]
+        
+        ai_costs = [
+            metrics['residual_human_cost'],  # Human cost that remains
+            metrics['ai_variable_cost'],  # Variable AI cost
+            metrics['subscription']  # Fixed AI subscription
+        ]
+        
+        # Create tabs for the pie charts
+        tab1, tab2 = st.tabs(["Before AI", "After AI"])
+        
+        with tab1:
+            fig_pie1 = go.Figure(data=[go.Pie(
+                labels=['Human Productive', 'Human Unproductive'],
+                values=[metrics['productive_cost'], metrics['unproductive_cost']],
+                hole=.4,
+                marker_colors=['#ff9e80', '#ffcc80']
+            )])
+            fig_pie1.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(color='white'),
+                height=300,
+                margin=dict(l=20, r=20, t=30, b=20),
+            )
+            st.plotly_chart(fig_pie1, use_container_width=True)
+            
+        with tab2:
+            fig_pie2 = go.Figure(data=[go.Pie(
+                labels=['Remaining Human', 'AI Variable', 'AI Subscription'],
+                values=[metrics['residual_human_cost'], metrics['ai_variable_cost'], metrics['subscription']],
+                hole=.4,
+                marker_colors=['#ff9e80', '#80cbc4', '#4db6ac']
+            )])
+            fig_pie2.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(color='white'),
+                height=300,
+                margin=dict(l=20, r=20, t=30, b=20),
+            )
+            st.plotly_chart(fig_pie2, use_container_width=True)
+    
+    # ─── GRAPH 4: Value Component Waterfall Chart ─────────────────
+    with col2:
+        st.subheader("Total Value Breakdown")
+        
+        # Prepare waterfall chart data
+        waterfall_x = ['Net Savings', 'Indirect Savings', 'Strategic Value', 'Total Value']
+        waterfall_y = [
+            metrics['net_savings'], 
+            metrics['indirect_savings'], 
+            metrics['strategic_savings'], 
+            0  # This is a dummy value for the total
+        ]
+        
+        # Create waterfall chart
+        fig_waterfall = go.Figure(go.Waterfall(
+            name="Value Sources", 
+            orientation="v",
+            measure=["relative", "relative", "relative", "total"],
+            x=waterfall_x,
+            y=waterfall_y,
+            connector={"line":{"color":"rgb(63, 63, 63)"}},
+            decreasing={"marker":{"color":"#ff9e80"}},
+            increasing={"marker":{"color":"#4db6ac"}},
+            totals={"marker":{"color":"#76ff03"}},
+        ))
+        
+        fig_waterfall.update_layout(
+            title="",
+            showlegend=False,
+            plot_bgcolor='rgba(0,0,0,0.1)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white'),
+            height=300,
+            margin=dict(l=20, r=20, t=30, b=40),
+            yaxis_tickprefix="$",
+        )
+        st.plotly_chart(fig_waterfall, use_container_width=True)
 
 # ─── Unit Tests ─────────────────────────────────────
 if not os.getenv('STREAMLIT_RUN'):
