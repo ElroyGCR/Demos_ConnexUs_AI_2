@@ -89,6 +89,9 @@ st.sidebar.subheader("🤖 AI Cost Inputs")
 subscription = st.sidebar.number_input("AI Subscription ($/mo)", value=2000, step=100)
 integration_fee = st.sidebar.number_input("Integration Fee ($)", value=15000, step=500)
 ai_cost_min = st.sidebar.number_input("AI Cost per Min ($)", value=0.20, step=0.01)
+# Add the AI Amplifier slider
+ai_amplifier = st.sidebar.slider("AI Efficiency Amplifier", 0.0, 10.0, 2.0, step=0.5, 
+                                help="How many times more efficient AI is compared to humans. Higher values mean AI can do more work at lower cost.")
 automation_pct = st.sidebar.slider("Automation Target (%)", 0, 100, 50, step=5)
 
 st.sidebar.subheader("📈 Value Adders")
@@ -107,10 +110,8 @@ baseline_human_cost = agents * hours_per_month * human_rate * burden_mul
 productive_cost = baseline_human_cost * (talk_pct/100)
 unproductive_cost = baseline_human_cost * (1 - talk_pct/100)
 
-# AI efficiency factor - AI's operational advantage over humans based on utilization
-# AI can work 24/7 while humans are limited by talk utilization
-# Fine-tuned based on Excel model to match expected returns
-ai_efficiency_factor = 2.0 if talk_pct > 0 else 2.0  # Optimized efficiency factor
+# AI efficiency factor - Using the slider value instead of hardcoded 2.0
+ai_efficiency_factor = ai_amplifier if ai_amplifier > 0 else 0.1  # Ensure we don't divide by zero
 
 # AI and human costs at the automation level
 residual_human_cost = baseline_human_cost * (1 - automation_pct/100)
@@ -122,11 +123,11 @@ ai_variable_cost = (productive_cost * (automation_pct/100)) / ai_efficiency_fact
 # Total AI-enabled cost
 ai_enabled_cost = residual_human_cost + ai_variable_cost + subscription
 
-# Net savings
-net_savings = baseline_human_cost - ai_enabled_cost
+# Net savings (renamed to Direct savings in the UI)
+direct_savings = baseline_human_cost - ai_enabled_cost
 
 # Monthly cost efficiency
-monthly_cost_efficiency = (net_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
+monthly_cost_efficiency = (direct_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
 
 # Indirect savings based on unproductive cost, enhanced by AI efficiency
 # AI efficiency means greater impact on reducing unproductive time
@@ -136,7 +137,7 @@ indirect_savings = unproductive_cost * (automation_pct/100) * ai_efficiency_fact
 strategic_savings = indirect_savings * (hr_pct/100) if include_hr else 0
 
 # Value basis
-value_basis = net_savings + indirect_savings + strategic_savings
+value_basis = direct_savings + indirect_savings + strategic_savings
 
 # ROI and payback calculations
 roi_integ_mo = (value_basis / integration_fee) * 100 if integration_fee > 0 else 0
@@ -165,28 +166,27 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-c1, c2, c3, c4 = st.columns(4)
+# First row - 3 metrics
+c1, c2, c3 = st.columns(3)
 with c1:
-    st.markdown(metric_block("Direct Monthly Savings", net_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Direct Monthly Savings", direct_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 with c2:
-    st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Total Value (Combined savings)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 with c3:
-    st.markdown(metric_block("Payback on Prod (mo)", payback_mo_prod, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
-with c4:
     st.markdown(metric_block("Monthly Cost Efficiency", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 
 # Add spacing between the rows of metric cards
 st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
 
-i1, i2, i3, i4 = st.columns(4)
+# Second row - 2 metrics
+i1, i2, i3 = st.columns(3)
 with i1:
-    st.markdown(metric_block("ROI on Integration (mo)", roi_integ_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
-with i2:
     st.markdown(metric_block("ROI on Integration (yr)", roi_integ_yr, "", "%", "{:,.1f}"), unsafe_allow_html=True)
+with i2:
+    st.markdown(metric_block("Payback on Int (month(s))", payback_mo_integ, "", "", "{:,.2f}"), unsafe_allow_html=True)
 with i3:
-    st.markdown(metric_block("Payback on Int (mo)", payback_mo_integ, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
-with i4:
-    st.markdown(metric_block("Total Value (Combined savings)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    # Empty column for balance
+    pass
 
 # Add toggle for detailed explanation of the metrics
 with st.expander("ℹ️ How are these metrics calculated?"):
@@ -196,32 +196,23 @@ with st.expander("ℹ️ How are these metrics calculated?"):
     st.write("- Formula: Agents × Hours × Rate × Burden - (Remaining Human Cost + AI Cost + Subscription)")
     
     st.write("**Monthly Cost Efficiency**: The percentage of baseline costs saved through AI implementation.")
-    st.write("- Formula: Net Savings ÷ Baseline Cost × 100")
+    st.write("- Formula: Direct Savings ÷ Baseline Cost × 100")
     st.write("- **What it means**: Higher percentages indicate greater cost reduction. This directly improves margin and profitability.")
     
     st.subheader("ROI Metrics")
-    st.write("**ROI on Production**: Return on investment relative to your baseline operational costs.")
-    st.write("- Shows how much value is returned for every dollar of your current operations")
-    st.write("- Formula: Total Value ÷ Baseline Cost × 100")
-    st.write("- **What it means**: A higher percentage indicates greater value creation. Your AI implementation is delivering nearly double the value of your current operational investment each month.")
-    
-    st.write("**ROI on Integration**: Return on investment relative to your upfront integration costs.")
+    st.write("**ROI on Integration (yr)**: Annual return on investment relative to your upfront integration costs.")
     st.write("- Shows how quickly you'll recover the initial integration fee")
-    st.write("- Formula: Total Value ÷ Integration Fee × 100")
+    st.write("- Formula: (Total Value × 12) ÷ Integration Fee × 100")
     st.write("- **What it means**: Higher percentages indicate faster recovery of integration costs. You're seeing exceptional returns on your integration investment.")
     
     st.subheader("Payback Metrics")
-    st.write("**Payback on Production**: Number of months required to recover your baseline operational costs.")
-    st.write("- Formula: Baseline Cost ÷ Total Value")
-    st.write("- **What it means**: Lower numbers are better. You'll recover your monthly operational investment quickly through AI implementation savings.")
-    
     st.write("**Payback on Integration**: Number of months required to recover your integration investment.")
     st.write("- Formula: Integration Fee ÷ Total Value")
     st.write("- **What it means**: Lower numbers indicate faster ROI. You'll recover your entire integration investment in less than a month - far better than most technology investments which typically take 6-18 months.")
     
     st.subheader("Total Value")
     st.write("**Total Value (Combined)**: The combined total of all direct and indirect savings.")
-    st.write("- Formula: Net Savings + Indirect Savings + Strategic Savings")
+    st.write("- Formula: Direct Savings + Indirect Savings + Strategic Savings")
     st.write("- **What it means**: This represents the total financial impact of implementing AI across your organization, including both immediate cost savings and broader operational improvements.")
 
 st.markdown("---")
@@ -434,7 +425,7 @@ with left:
     
     fig2.add_trace(go.Bar(
         name="Direct Savings",
-        x=["Savings"], y=[net_savings],
+        x=["Savings"], y=[direct_savings],
         marker_color="#66BB6A"
     ))
 
@@ -471,7 +462,7 @@ with right:
         row-gap: 10px;
         margin-top: 60px;
     '>
-      {metric_block("Direct Savings", net_savings, "$", "", "{:,.0f}")}
+      {metric_block("Direct Savings", direct_savings, "$", "", "{:,.0f}")}
       {metric_block("Indirect Savings", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
       {metric_block("HR Strategic", strategic_savings, "$", "", "{:,.0f}") if include_hr else ""}
     </div>
