@@ -198,8 +198,17 @@ with graph_col:
     
     # Calculate cumulative savings
     monthly_value = metrics['total_value']
-    initial_cost = -metrics['integration_fee']
-    cumulative = [initial_cost + (monthly_value * i) for i in months]
+    initial_investment = metrics['integration_fee']  # Don't negate it here
+    
+    # Create a list with initial investment as negative first value
+    cumulative = [-initial_investment]
+    
+    # Add the monthly savings for each subsequent month
+    for i in range(1, 25):
+        cumulative.append(cumulative[0] + (monthly_value * i))
+    
+    # Remove the first element to match our months list
+    cumulative = cumulative[1:]
     
     # Create dataframe for the line chart
     roi_data = pd.DataFrame({
