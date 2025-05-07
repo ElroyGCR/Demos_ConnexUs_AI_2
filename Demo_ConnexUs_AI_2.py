@@ -16,6 +16,14 @@ except ImportError:
         "Please install Streamlit by running 'pip install streamlit' in your environment."
     )
 
+# ─── Page Setup ────────────────────────────────────────
+# IMPORTANT: st.set_page_config must be the first Streamlit command
+st.set_page_config(page_title="AI Savings Calculator", layout="wide", page_icon="💰")
+
+# Get branding inputs (these can't affect page config now)
+brand_title = st.sidebar.text_input("App Title", value="AI Savings Calculator")
+brand_icon = st.sidebar.text_input("App Icon (emoji)", value="💰")
+
 # ─── Calculation Logic ─────────────────────────────────
 
 def calculate_metrics(
@@ -93,16 +101,11 @@ def render_banner(metrics: dict):
 
     st.markdown(f"""
     <div class='banner'>
-      <h2>You’ll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
+      <h2>You'll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
       <p>For every $1 you spend on AI, you get {banner_ret} back.</p>
-      <p>You’ll get your setup money back in {banner_pay} months.</p>
+      <p>You'll get your setup money back in {banner_pay} months.</p>
     </div>
     """, unsafe_allow_html=True)
-
-# ─── Page Setup ────────────────────────────────────────
-brand_title = st.sidebar.text_input("App Title", value="AI Savings Calculator")
-brand_icon = st.sidebar.text_input("App Icon (emoji)", value="💰")
-st.set_page_config(page_title=brand_title, layout="wide", page_icon=brand_icon)
 
 # ─── Styles ────────────────────────────────────────────
 st.markdown("""
