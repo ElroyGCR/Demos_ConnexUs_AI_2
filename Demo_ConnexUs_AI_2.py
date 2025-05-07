@@ -81,7 +81,7 @@ TRANSPARENT_LAYOUT = dict(
 st.sidebar.header("⚙️ Inputs")
 agents = st.sidebar.number_input("Agents (FTE)", min_value=1, value=15, step=1)
 human_rate = st.sidebar.number_input("Human Hourly Cost ($)", min_value=5.0, value=12.0, step=1.0)
-burden_pct = st.sidebar.slider("Burden (Benefits %)​", 0, 75, 35, step=5)
+burden_pct = st.sidebar.slider("Labor Burden (including benefits, taxes, and other expenses %)​", 0, 75, 35, step=5)
 talk_pct = st.sidebar.slider("Talk Utilization (%)", 0, 100, 40, step=5)
 hours_per_month = st.sidebar.number_input("Hours per Agent / Month", value=173.2, step=1.0)
 
@@ -167,7 +167,7 @@ st.markdown("""
 
 c1, c2, c3, c4 = st.columns(4)
 with c1:
-    st.markdown(metric_block("Net Monthly Savings", net_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Direct Monthly Savings", net_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 with c2:
     st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 with c3:
@@ -186,12 +186,12 @@ with i2:
 with i3:
     st.markdown(metric_block("Payback on Int (mo)", payback_mo_integ, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
 with i4:
-    st.markdown(metric_block("Total Value (Combined)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Total Value (Combined savings)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 
 # Add toggle for detailed explanation of the metrics
 with st.expander("ℹ️ How are these metrics calculated?"):
     st.subheader("Direct Savings Metrics")
-    st.write("**Net Monthly Savings**: The total monthly cost reduction achieved by implementing AI.")
+    st.write("**Direct Monthly Savings**: The total monthly cost reduction achieved by implementing AI.")
     st.write("- Calculated as: Baseline human cost minus AI-enabled cost")
     st.write("- Formula: Agents × Hours × Rate × Burden - (Remaining Human Cost + AI Cost + Subscription)")
     
@@ -433,14 +433,14 @@ with left:
     fig2 = go.Figure()
     
     fig2.add_trace(go.Bar(
-        name="Net Savings",
+        name="Direct Savings",
         x=["Savings"], y=[net_savings],
         marker_color="#66BB6A"
     ))
 
     if include_indirect:
         fig2.add_trace(go.Bar(
-            name="Indirect Sav.",
+            name="Indirect Savings",
             x=["Savings"], y=[indirect_savings],
             marker_color="#FFA726"
         ))
@@ -471,8 +471,8 @@ with right:
         row-gap: 10px;
         margin-top: 60px;
     '>
-      {metric_block("Net Savings", net_savings, "$", "", "{:,.0f}")}
-      {metric_block("Indirect Sav.", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
+      {metric_block("Direct Savings", net_savings, "$", "", "{:,.0f}")}
+      {metric_block("Indirect Savings", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
       {metric_block("HR Strategic", strategic_savings, "$", "", "{:,.0f}") if include_hr else ""}
     </div>
     """
@@ -482,7 +482,7 @@ with right:
 with st.expander("ℹ️ Understanding the savings breakdown"):
     st.subheader("Total Monthly Value")
     st.write("This stacked chart shows how your total monthly value is composed of different types of savings:")
-    st.write("- **Net Savings**: Direct operational cost reduction from implementing AI")
+    st.write("- **Direct Savings**: Direct operational cost reduction from implementing AI")
     st.write("- **Indirect Savings**: Productivity improvements and reduction in unproductive time")
     st.write("- **HR Strategic Impact**: Higher-order benefits from improved workforce management")
     
