@@ -7,7 +7,7 @@ from decimal import Decimal, ROUND_HALF_UP
 import os
 
 # ─── Page Setup ────────────────────────────────────────
-st.set_page_config(page_title="ConnexUS AI ROI Calculator", layout="wide", page_icon=None)
+st.set_page_config(page_title="ConnexUS AI ROI Calculator", layout="wide", page_icon="favicon.ico")
 
 # ─── Helper to load favicon and watermark ───────────────
 def load_base64(path):
@@ -31,6 +31,12 @@ try:
     if favicon_b64:
         st.markdown(
             f"""<link rel="icon" href="data:image/png;base64,{favicon_b64}" type="image/png">""",
+            unsafe_allow_html=True,
+        )
+    else:
+        # Fallback favicon as base64 encoded string (if the file isn't found)
+        st.markdown(
+            """<link rel="icon" href="data:image/png;base64,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" type="image/png">""",
             unsafe_allow_html=True,
         )
 
@@ -63,24 +69,35 @@ st.markdown("""
   .metric-label { color: #DDD; font-size:14px; }
   .metric-value { color: #00FFAA; font-size: 32px; font-weight:bold; }
   
-  /* Improve section header styling */
+  /* Improved section header styling */
   .section-header { 
     margin-bottom: 0.5rem; 
     display: flex; 
     align-items: center;
   }
-  .section-header img {
-    margin-right: 10px;
-  }
   
   /* Reduce vertical spacing */
   .reduced-spacing { margin-top: -15px; margin-bottom: -15px; }
   
-  /* Custom divider style */
-  .custom-divider {
-    border-top: 1px solid rgba(250, 250, 250, 0.2);
-    margin-top: 20px;
+  /* Logo styling */
+  .logo-container {
     margin-bottom: 20px;
+    margin-top: 10px;
+  }
+  
+  /* FAQ button styling */
+  .st-emotion-cache-ocqkz7 {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+  }
+  
+  /* Category styling for FAQ */
+  .faq-category {
+    font-size: 18px !important;
+    font-weight: bold !important;
+    margin-top: 10px !important;
+    margin-bottom: 5px !important;
+    color: #00FFAA !important;
   }
 </style>
 """, unsafe_allow_html=True)
@@ -185,11 +202,19 @@ payback_mo_integ = integration_fee / value_basis if value_basis > 0 else float('
 roi_prod_mo = (value_basis / baseline_human_cost) * 100 if baseline_human_cost > 0 else 0
 payback_mo_prod = baseline_human_cost / value_basis if value_basis > 0 else float('inf')
 
-# ─── Main Title ─────────────────────────────────────────
-st.title("ConnexUS AI ROI Calculator")
-
-# Add divider using direct HTML
-st.markdown('<div style="border-top: 1px solid rgba(250, 250, 250, 0.2); margin-top: 20px; margin-bottom: 20px;"></div>', unsafe_allow_html=True)
+# ─── Logo Display ────────────────────────────────────────
+# Load and display the ConnexUS logo in the top left corner
+logo_path = "connexus_logo.png"
+logo_b64 = load_base64(logo_path)
+if logo_b64:
+    st.markdown(f"""
+    <div class="logo-container">
+        <img src="data:image/png;base64,{logo_b64}" style="height:50px;" alt="ConnexUS Logo">
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    # If logo not found, display text version
+    st.markdown('<div class="logo-container"><span style="font-size:24px; font-weight:bold; color:#00FFAA;">ConnexUS</span></div>', unsafe_allow_html=True)
 
 # ─── Combined Metrics Overview and AI Investment Impact Section ──────────────────────────
 section_header("ROI Metrics & Investment Impact")
@@ -284,9 +309,6 @@ with st.expander("ℹ️ How are these metrics calculated?"):
     
     st.write("**What this means for your business:** This is perhaps the most compelling metric for financial decision makers. This return far exceeds most technology investments, which typically return $1.30-$2.50. This positions AI automation as one of the highest-ROI technologies available to contact centers today.")
 
-# Add divider using direct HTML
-st.markdown('<div style="border-top: 1px solid rgba(250, 250, 250, 0.2); margin-top: 20px; margin-bottom: 20px;"></div>', unsafe_allow_html=True)
-
 # ─── Human vs Hybrid Cost Comparison ───────────────────
 section_header("Human vs Hybrid Cost Comparison")
 
@@ -356,9 +378,6 @@ with st.expander("ℹ️ How to read this cost comparison"):
     
     st.write("While maintaining the same service capacity, you're able to operate at a significantly lower cost base - this directly improves EBITDA and gives you competitive pricing advantages in your market.")
 
-# Add divider using direct HTML
-st.markdown('<div style="border-top: 1px solid rgba(250, 250, 250, 0.2); margin-top: 20px; margin-bottom: 20px;"></div>', unsafe_allow_html=True)
-
 # ─── Savings Breakdown ─────────────────────────────────
 section_header("Savings Breakdown")
 
@@ -414,7 +433,7 @@ with right:
         display: flex;
         flex-direction: column;
         row-gap: 10px;
-        margin-top: 40px;
+        margin-top: 10px;
     '>
       {metric_block("Direct Savings", direct_savings, "$", "", "{:,.0f}")}
       {metric_block("Indirect Savings", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
@@ -441,10 +460,7 @@ with st.expander("ℹ️ Understanding the savings breakdown"):
     
     st.write("*Note: Toggle the \"Include Indirect Value\" and \"Include HR Strategic Impact\" options in the sidebar to see how these additional value components affect your overall ROI.*")
 
-# Add divider using direct HTML
-st.markdown('<div style="border-top: 1px solid rgba(250, 250, 250, 0.2); margin-top: 20px; margin-bottom: 20px;"></div>', unsafe_allow_html=True)
-
-# ─── FAQ Section with Simplified Structure ────────────────────
+# ─── FAQ Section with Enhanced Styling ────────────────────
 section_header("Frequently Asked Questions")
 
 # Header description
@@ -456,146 +472,133 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Master FAQ expander - simpler structure avoiding nested expanders
-with st.expander("➕ Show All FAQs"):
-    # Use a more reliable structure with headers and content directly in the expander
-    st.subheader("🔹 Why Businesses Are Switching to AI Voice Agents")
-    
-    st.markdown("**What exactly is an AI Voice Representative?**")
-    st.write("""
-    • AI Voice Representatives are cutting-edge virtual agents that revolutionize how businesses handle communications. They conduct remarkably natural phone conversations, answer complex questions, process requests, and deliver consistent excellence 24/7/365. 
-    
-    • Unlike human agents who need breaks, vacations, and sick days, our AI Voice Representatives work around the clock with zero downtime, zero turnover, and zero training requirements—transforming your customer service from a cost center into a competitive advantage.
-    """)
-    
-    st.markdown("**How do AI Voice Agents differ from traditional IVR systems?**")
-    st.write("""
-    • Unlike traditional IVR systems that force callers through rigid menu trees, our AI Voice Agents engage in natural conversations. They don't just recognize keywords—they understand intent, can handle complex inquiries, and provide personalized responses that sound human, creating a dramatically improved customer experience.
-    """)
+# Master FAQ expander with larger, more appealing font size
+with st.expander("➕ Show All FAQs", expanded=False):
+    # Create collapsible categories for each FAQ section
+    with st.expander("💼 Why Businesses Are Switching to AI Voice Agents", expanded=False):
+        st.markdown("**What exactly is an AI Voice Representative?**")
+        st.write("""
+        • AI Voice Representatives are cutting-edge virtual agents that revolutionize how businesses handle communications. They conduct remarkably natural phone conversations, answer complex questions, process requests, and deliver consistent excellence 24/7/365. 
+        
+        • Unlike human agents who need breaks, vacations, and sick days, our AI Voice Representatives work around the clock with zero downtime, zero turnover, and zero training requirements—transforming your customer service from a cost center into a competitive advantage.
+        """)
+        
+        st.markdown("**How do AI Voice Agents differ from traditional IVR systems?**")
+        st.write("""
+        • Unlike traditional IVR systems that force callers through rigid menu trees, our AI Voice Agents engage in natural conversations. They don't just recognize keywords—they understand intent, can handle complex inquiries, and provide personalized responses that sound human, creating a dramatically improved customer experience.
+        """)
 
-    st.markdown("<hr style='margin: 15px 0; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
-    st.subheader("🔹 Cost Savings & Operational Efficiency")
-    
-    st.markdown("**What kind of cost savings can I expect?**")
-    st.write("""
-    Businesses typically slash communication costs by 50-70% when implementing AI Voice Agents. Beyond the obvious savings on salaries and benefits, you'll eliminate costly overhead from:
+    with st.expander("💰 Cost Savings & Operational Efficiency", expanded=False):
+        st.markdown("**What kind of cost savings can I expect?**")
+        st.write("""
+        Businesses typically slash communication costs by 50-70% when implementing AI Voice Agents. Beyond the obvious savings on salaries and benefits, you'll eliminate costly overhead from:
 
-    - **Recruitment & Turnover Costs**: No more spending thousands on hiring replacements for the average 30-45% annual call center attrition
-    - **Training Expenses**: Eliminate the 2-6 weeks of paid training for each new agent
-    - **Absenteeism & No-Shows**: The average call center loses 7-15% of scheduled hours to unexpected absences and no-shows
-    - **Management Overhead**: Reduce supervisory staff needed for scheduling, quality monitoring, and performance management
-    
-    *Use our ROI calculator above to see your specific savings potential.*
-    """)
-    
-    st.markdown("**How do AI Voice Agents improve operational efficiency?**")
-    st.write("""
-    Our AI Voice Agents transform your operation with:
+        - **Recruitment & Turnover Costs**: No more spending thousands on hiring replacements for the average 30-45% annual call center attrition
+        - **Training Expenses**: Eliminate the 2-6 weeks of paid training for each new agent
+        - **Absenteeism & No-Shows**: The average call center loses 7-15% of scheduled hours to unexpected absences and no-shows
+        - **Management Overhead**: Reduce supervisory staff needed for scheduling, quality monitoring, and performance management
+        
+        *Use our ROI calculator above to see your specific savings potential.*
+        """)
+        
+        st.markdown("**How do AI Voice Agents improve operational efficiency?**")
+        st.write("""
+        Our AI Voice Agents transform your operation with:
 
-    - **24/7/365 Availability**: Never miss another call, even at 3 AM or during holidays
-    - **Infinite Scalability**: Handle sudden call spikes without scrambling to staff up
-    - **Zero Ramp-Up Time**: Deploy additional capacity instantly during seasonal peaks
-    - **Perfect Consistency**: Every caller receives the same high-quality experience
-    - **Zero Burnout**: Unlike humans, AI agents maintain peak performance regardless of call volume or complexity
-    - **Instant Knowledge Updates**: New information is available across all AI agents simultaneously without training sessions
-    """)
-    
-    st.markdown("**What happens to my business when calls go unanswered?**")
-    st.write("""
-    Every missed call is potentially thousands in lost revenue. Studies show:
+        - **24/7/365 Availability**: Never miss another call, even at 3 AM or during holidays
+        - **Infinite Scalability**: Handle sudden call spikes without scrambling to staff up
+        - **Zero Ramp-Up Time**: Deploy additional capacity instantly during seasonal peaks
+        - **Perfect Consistency**: Every caller receives the same high-quality experience
+        - **Zero Burnout**: Unlike humans, AI agents maintain peak performance regardless of call volume or complexity
+        - **Instant Knowledge Updates**: New information is available across all AI agents simultaneously without training sessions
+        """)
+        
+        st.markdown("**What happens to my business when calls go unanswered?**")
+        st.write("""
+        Every missed call is potentially thousands in lost revenue. Studies show:
 
-    - 85% of customers whose calls go unanswered will not call back
-    - 75% of callers will form a negative impression of your business from unanswered calls
-    - The average missed sales call represents $1,200-$4,800 in lost potential revenue
-    
-    Our AI Voice Agents ensure every call is answered promptly, even during peak hours, nights, weekends, and holidays – capturing revenue that would otherwise be lost.
-    """)
+        - 85% of customers whose calls go unanswered will not call back
+        - 75% of callers will form a negative impression of your business from unanswered calls
+        - The average missed sales call represents $1,200-$4,800 in lost potential revenue
+        
+        Our AI Voice Agents ensure every call is answered promptly, even during peak hours, nights, weekends, and holidays – capturing revenue that would otherwise be lost.
+        """)
 
-    st.markdown("<hr style='margin: 15px 0; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
-    st.subheader("🔹 Implementation & Integration")
-    
-    st.markdown("**How long does it take to implement AI Voice Agents?**")
-    st.write("""
-    • Implementation timelines depend on the specific product type you choose and your business requirements. Many of our solutions can be deployed rapidly with minimal setup time. 
-    
-    • For detailed information about implementation for your specific needs, please contact us through our website at www.connexus.ai.
-    """)
-    
-    st.markdown("**Will AI Voice Agents integrate with my existing systems?**")
-    st.write("""
-    • Absolutely! Our flexible integration framework connects with virtually any business system you're currently using. Whether it's a popular CRM like Salesforce, your proprietary databases, or legacy phone systems, we design custom integration pathways that make implementation smooth and non-disruptive. 
-    
-    • Contact us at www.connexus.ai for a personalized integration assessment.
-    """)
+    with st.expander("🔌 Implementation & Integration", expanded=False):
+        st.markdown("**How long does it take to implement AI Voice Agents?**")
+        st.write("""
+        • Implementation timelines depend on the specific product type you choose and your business requirements. Many of our solutions can be deployed rapidly with minimal setup time. 
+        
+        • For detailed information about implementation for your specific needs, please contact us through our website at www.connexus.ai.
+        """)
+        
+        st.markdown("**Will AI Voice Agents integrate with my existing systems?**")
+        st.write("""
+        • Absolutely! Our flexible integration framework connects with virtually any business system you're currently using. Whether it's a popular CRM like Salesforce, your proprietary databases, or legacy phone systems, we design custom integration pathways that make implementation smooth and non-disruptive. 
+        
+        • Contact us at www.connexus.ai for a personalized integration assessment.
+        """)
 
-    st.markdown("<hr style='margin: 15px 0; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
-    st.subheader("🔹 Capabilities & Limitations")
-    
-    st.markdown("**What types of calls can AI Voice Agents handle effectively?**")
-    st.write("""
-    • Our AI Voice Agents excel at handling appointment scheduling, customer service inquiries, order status updates, product information requests, lead qualification, and routine transactions. They're particularly effective for high-volume, repetitive call types that follow predictable patterns.
-    """)
-    
-    st.markdown("**How do AI Voice Agents handle complex or unusual customer requests?**")
-    st.write("""
-    • Our AI Voice Agents are designed to recognize when a conversation exceeds their capabilities. In these situations, they seamlessly transfer the call to a human agent, providing a complete transcript and summary of the conversation so the human agent can pick up exactly where the AI left off—creating a smooth customer experience.
-    """)
-    
-    st.markdown("**Can AI Voice Agents make outbound calls too?**")
-    st.write("""
-    • Absolutely! Our AI Voice Agents can conduct outbound calling campaigns for appointment reminders, payment collection, satisfaction surveys, lead qualification, and promotional offers. They can reach hundreds of customers simultaneously with personalized conversations that drive results.
-    """)
+    with st.expander("⚙️ Capabilities & Limitations", expanded=False):
+        st.markdown("**What types of calls can AI Voice Agents handle effectively?**")
+        st.write("""
+        • Our AI Voice Agents excel at handling appointment scheduling, customer service inquiries, order status updates, product information requests, lead qualification, and routine transactions. They're particularly effective for high-volume, repetitive call types that follow predictable patterns.
+        """)
+        
+        st.markdown("**How do AI Voice Agents handle complex or unusual customer requests?**")
+        st.write("""
+        • Our AI Voice Agents are designed to recognize when a conversation exceeds their capabilities. In these situations, they seamlessly transfer the call to a human agent, providing a complete transcript and summary of the conversation so the human agent can pick up exactly where the AI left off—creating a smooth customer experience.
+        """)
+        
+        st.markdown("**Can AI Voice Agents make outbound calls too?**")
+        st.write("""
+        • Absolutely! Our AI Voice Agents can conduct outbound calling campaigns for appointment reminders, payment collection, satisfaction surveys, lead qualification, and promotional offers. They can reach hundreds of customers simultaneously with personalized conversations that drive results.
+        """)
 
-    st.markdown("<hr style='margin: 15px 0; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
-    st.subheader("🔹 Quality & Customer Experience")
-    
-    st.markdown("**How natural do the AI Voice Agents sound?**")
-    st.write("""
-    • Our advanced AI technology produces remarkably natural-sounding voices that many callers cannot distinguish from humans. The agents understand context, respond to emotional cues, adjust their tone appropriately, and can even insert thoughtful pauses and conversational fillers for an authentic experience.
-    """)
-    
-    st.markdown("**What languages do your AI Voice Agents support?**")
-    st.write("""
-    • Our AI Voice Agents currently support over 25 languages including English, Spanish, French, German, Italian, Portuguese, Mandarin, Japanese, and Arabic. Each language version maintains natural intonation and cultural nuances for an authentic experience regardless of region.
-    """)
-    
-    st.markdown("**How do customers typically react to AI Voice Agents?**")
-    st.write("""
-    • Customer satisfaction scores with our AI Voice Agents average 4.7/5 across industries. Customers particularly appreciate the instant response (no hold times), 24/7 availability, and consistent experience. In blind tests, over 60% of customers couldn't tell they were speaking with an AI agent.
-    """)
+    with st.expander("😊 Quality & Customer Experience", expanded=False):
+        st.markdown("**How natural do the AI Voice Agents sound?**")
+        st.write("""
+        • Our advanced AI technology produces remarkably natural-sounding voices that many callers cannot distinguish from humans. The agents understand context, respond to emotional cues, adjust their tone appropriately, and can even insert thoughtful pauses and conversational fillers for an authentic experience.
+        """)
+        
+        st.markdown("**What languages do your AI Voice Agents support?**")
+        st.write("""
+        • Our AI Voice Agents currently support over 25 languages including English, Spanish, French, German, Italian, Portuguese, Mandarin, Japanese, and Arabic. Each language version maintains natural intonation and cultural nuances for an authentic experience regardless of region.
+        """)
+        
+        st.markdown("**How do customers typically react to AI Voice Agents?**")
+        st.write("""
+        • Customer satisfaction scores with our AI Voice Agents average 4.7/5 across industries. Customers particularly appreciate the instant response (no hold times), 24/7 availability, and consistent experience. In blind tests, over 60% of customers couldn't tell they were speaking with an AI agent.
+        """)
 
-    st.markdown("<hr style='margin: 15px 0; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
-    st.subheader("🔹 Security & Compliance")
-    
-    st.markdown("**How secure is the AI Voice Agent solution?**")
-    st.write("""
-    • Our AI Voice Agent platform is built with enterprise-grade security. All conversations are encrypted end-to-end, we maintain SOC 2 Type II compliance, and can support industry-specific requirements like HIPAA for healthcare and PCI DSS for payment processing. Your data and your customers' information remains secure at all times.
-    """)
-    
-    st.markdown("**Do AI Voice Agents comply with disclosure requirements?**")
-    st.write("""
-    • Yes. Our AI Voice Agents can be configured to disclose their virtual nature at the beginning of calls in compliance with emerging AI transparency regulations. This disclosure can be customized based on your preferences and regulatory requirements in your operating regions.
-    """)
+    with st.expander("🔒 Security & Compliance", expanded=False):
+        st.markdown("**How secure is the AI Voice Agent solution?**")
+        st.write("""
+        • Our AI Voice Agent platform is built with enterprise-grade security. All conversations are encrypted end-to-end, we maintain SOC 2 Type II compliance, and can support industry-specific requirements like HIPAA for healthcare and PCI DSS for payment processing. Your data and your customers' information remains secure at all times.
+        """)
+        
+        st.markdown("**Do AI Voice Agents comply with disclosure requirements?**")
+        st.write("""
+        • Yes. Our AI Voice Agents can be configured to disclose their virtual nature at the beginning of calls in compliance with emerging AI transparency regulations. This disclosure can be customized based on your preferences and regulatory requirements in your operating regions.
+        """)
 
-    st.markdown("<hr style='margin: 15px 0; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
-    st.subheader("🔹 Getting Started")
-    
-    st.markdown("**How can I see your AI Voice Agents in action?**")
-    st.write("""
-    • Experience our AI Voice Agents firsthand with our interactive demo right on this website. Better yet, schedule a personalized demonstration where we'll show you exactly how our technology can transform your specific business operations, handling your unique call scenarios with precision and natural conversation flow.
-    """)
-    
-    st.markdown("**How is pricing structured for AI Voice Agents?**")
-    st.write("""
-    • Pricing depends on the specific product package that best fits your business needs. Unlike traditional call centers with unpredictable staffing costs, our pricing models offer predictability and transparency. Many clients find our ROI calculator eye-opening when they see the potential cost savings. 
-    
-    • For detailed pricing information tailored to your requirements, please contact us through our website at www.connexus.ai.
-    """)
-    
-    st.markdown("**What's the first step in getting started with AI Voice Agents?**")
-    st.write("""
-    • The best way to begin is by scheduling a free consultation through our website at www.connexus.ai. Our experts will assess your current call operations, identify opportunities for AI implementation, and provide a customized proposal showing expected cost savings and performance improvements specific to your business model.
-    """)
+    with st.expander("🚀 Getting Started", expanded=False):
+        st.markdown("**How can I see your AI Voice Agents in action?**")
+        st.write("""
+        • Experience our AI Voice Agents firsthand with our interactive demo right on this website. Better yet, schedule a personalized demonstration where we'll show you exactly how our technology can transform your specific business operations, handling your unique call scenarios with precision and natural conversation flow.
+        """)
+        
+        st.markdown("**How is pricing structured for AI Voice Agents?**")
+        st.write("""
+        • Pricing depends on the specific product package that best fits your business needs. Unlike traditional call centers with unpredictable staffing costs, our pricing models offer predictability and transparency. Many clients find our ROI calculator eye-opening when they see the potential cost savings. 
+        
+        • For detailed pricing information tailored to your requirements, please contact us through our website at www.connexus.ai.
+        """)
+        
+        st.markdown("**What's the first step in getting started with AI Voice Agents?**")
+        st.write("""
+        • The best way to begin is by scheduling a free consultation through our website at www.connexus.ai. Our experts will assess your current call operations, identify opportunities for AI implementation, and provide a customized proposal showing expected cost savings and performance improvements specific to your business model.
+        """)
 
 # Add some spacing at the bottom
 st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
