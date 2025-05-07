@@ -536,7 +536,7 @@ st.markdown("### Cost Savings & Operational Efficiency")
 
 with st.expander("What kind of cost savings can I expect?"):
     st.write("""
-    • Businesses typically slash communication costs by 50-70% when implementing AI Voice Agents. Beyond the obvious savings on salaries and benefits, you'll eliminate costly overhead from:
+    Businesses typically slash communication costs by 50-70% when implementing AI Voice Agents. Beyond the obvious savings on salaries and benefits, you'll eliminate costly overhead from:
 
     - **Recruitment & Turnover Costs**: No more spending thousands on hiring replacements for the average 30-45% annual call center attrition
     - **Training Expenses**: Eliminate the 2-6 weeks of paid training for each new agent
@@ -574,16 +574,16 @@ st.markdown("### Implementation & Integration")
 
 with st.expander("How long does it take to implement AI Voice Agents?"):
     st.write("""
-    Implementation timelines depend on the specific product type you choose and your business requirements. Many of our solutions can be deployed rapidly with minimal setup time. 
+    • Implementation timelines depend on the specific product type you choose and your business requirements. Many of our solutions can be deployed rapidly with minimal setup time. 
     
-    For detailed information about implementation for your specific needs, please contact us through our website at www.connexus.ai.
+    • For detailed information about implementation for your specific needs, please contact us through our website at www.connexus.ai.
     """)
 
 with st.expander("Will AI Voice Agents integrate with my existing systems?"):
     st.write("""
-    Absolutely! Our flexible integration framework connects with virtually any business system you're currently using. Whether it's a popular CRM like Salesforce, your proprietary databases, or legacy phone systems, we design custom integration pathways that make implementation smooth and non-disruptive. 
+    • Absolutely! Our flexible integration framework connects with virtually any business system you're currently using. Whether it's a popular CRM like Salesforce, your proprietary databases, or legacy phone systems, we design custom integration pathways that make implementation smooth and non-disruptive. 
     
-    Contact us at www.connexus.ai for a personalized integration assessment.
+    • Contact us at www.connexus.ai for a personalized integration assessment.
     """)
 
 # Category 4: Capabilities & Limitations
@@ -591,17 +591,17 @@ st.markdown("### Capabilities & Limitations")
 
 with st.expander("What types of calls can AI Voice Agents handle effectively?"):
     st.write("""
-    Our AI Voice Agents excel at handling appointment scheduling, customer service inquiries, order status updates, product information requests, lead qualification, and routine transactions. They're particularly effective for high-volume, repetitive call types that follow predictable patterns.
+    • Our AI Voice Agents excel at handling appointment scheduling, customer service inquiries, order status updates, product information requests, lead qualification, and routine transactions. They're particularly effective for high-volume, repetitive call types that follow predictable patterns.
     """)
 
 with st.expander("How do AI Voice Agents handle complex or unusual customer requests?"):
     st.write("""
-    Our AI Voice Agents are designed to recognize when a conversation exceeds their capabilities. In these situations, they seamlessly transfer the call to a human agent, providing a complete transcript and summary of the conversation so the human agent can pick up exactly where the AI left off—creating a smooth customer experience.
+    • Our AI Voice Agents are designed to recognize when a conversation exceeds their capabilities. In these situations, they seamlessly transfer the call to a human agent, providing a complete transcript and summary of the conversation so the human agent can pick up exactly where the AI left off—creating a smooth customer experience.
     """)
 
 with st.expander("Can AI Voice Agents make outbound calls too?"):
     st.write("""
-    Absolutely! Our AI Voice Agents can conduct outbound calling campaigns for appointment reminders, payment collection, satisfaction surveys, lead qualification, and promotional offers. They can reach hundreds of customers simultaneously with personalized conversations that drive results.
+    • Absolutely! Our AI Voice Agents can conduct outbound calling campaigns for appointment reminders, payment collection, satisfaction surveys, lead qualification, and promotional offers. They can reach hundreds of customers simultaneously with personalized conversations that drive results.
     """)
 
 # Category 5: Quality & Customer Experience
@@ -609,17 +609,17 @@ st.markdown("### Quality & Customer Experience")
 
 with st.expander("How natural do the AI Voice Agents sound?"):
     st.write("""
-    Our advanced AI technology produces remarkably natural-sounding voices that many callers cannot distinguish from humans. The agents understand context, respond to emotional cues, adjust their tone appropriately, and can even insert thoughtful pauses and conversational fillers for an authentic experience.
+    • Our advanced AI technology produces remarkably natural-sounding voices that many callers cannot distinguish from humans. The agents understand context, respond to emotional cues, adjust their tone appropriately, and can even insert thoughtful pauses and conversational fillers for an authentic experience.
     """)
 
 with st.expander("What languages do your AI Voice Agents support?"):
     st.write("""
-    Our AI Voice Agents currently support over 25 languages including English, Spanish, French, German, Italian, Portuguese, Mandarin, Japanese, and Arabic. Each language version maintains natural intonation and cultural nuances for an authentic experience regardless of region.
+    • Our AI Voice Agents currently support over 25 languages including English, Spanish, French, German, Italian, Portuguese, Mandarin, Japanese, and Arabic. Each language version maintains natural intonation and cultural nuances for an authentic experience regardless of region.
     """)
 
 with st.expander("How do customers typically react to AI Voice Agents?"):
     st.write("""
-    Customer satisfaction scores with our AI Voice Agents average 4.7/5 across industries. Customers particularly appreciate the instant response (no hold times), 24/7 availability, and consistent experience. In blind tests, over 60% of customers couldn't tell they were speaking with an AI agent.
+    • Customer satisfaction scores with our AI Voice Agents average 4.7/5 across industries. Customers particularly appreciate the instant response (no hold times), 24/7 availability, and consistent experience. In blind tests, over 60% of customers couldn't tell they were speaking with an AI agent.
     """)
 
 # Category 6: Security & Compliance
@@ -627,12 +627,12 @@ st.markdown("### Security & Compliance")
 
 with st.expander("How secure is the AI Voice Agent solution?"):
     st.write("""
-    Our AI Voice Agent platform is built with enterprise-grade security. All conversations are encrypted end-to-end, we maintain SOC 2 Type II compliance, and can support industry-specific requirements like HIPAA for healthcare and PCI DSS for payment processing. Your data and your customers' information remains secure at all times.
+    • Our AI Voice Agent platform is built with enterprise-grade security. All conversations are encrypted end-to-end, we maintain SOC 2 Type II compliance, and can support industry-specific requirements like HIPAA for healthcare and PCI DSS for payment processing. Your data and your customers' information remains secure at all times.
     """)
 
 with st.expander("Do AI Voice Agents comply with disclosure requirements?"):
     st.write("""
-    Yes. Our AI Voice Agents can be configured to disclose their virtual nature at the beginning of calls in compliance with emerging AI transparency regulations. This disclosure can be customized based on your preferences and regulatory requirements in your operating regions.
+    • Yes. Our AI Voice Agents can be configured to disclose their virtual nature at the beginning of calls in compliance with emerging AI transparency regulations. This disclosure can be customized based on your preferences and regulatory requirements in your operating regions.
     """)
 
 # Category 7: Getting Started
@@ -640,19 +640,19 @@ st.markdown("### Getting Started")
 
 with st.expander("How can I see your AI Voice Agents in action?"):
     st.write("""
-    Experience our AI Voice Agents firsthand with our interactive demo right on this website. Better yet, schedule a personalized demonstration where we'll show you exactly how our technology can transform your specific business operations, handling your unique call scenarios with precision and natural conversation flow.
+    • Experience our AI Voice Agents firsthand with our interactive demo right on this website. Better yet, schedule a personalized demonstration where we'll show you exactly how our technology can transform your specific business operations, handling your unique call scenarios with precision and natural conversation flow.
     """)
 
 with st.expander("How is pricing structured for AI Voice Agents?"):
     st.write("""
-    Pricing depends on the specific product package that best fits your business needs. Unlike traditional call centers with unpredictable staffing costs, our pricing models offer predictability and transparency. Many clients find our ROI calculator eye-opening when they see the potential cost savings. 
+    • Pricing depends on the specific product package that best fits your business needs. Unlike traditional call centers with unpredictable staffing costs, our pricing models offer predictability and transparency. Many clients find our ROI calculator eye-opening when they see the potential cost savings. 
     
-    For detailed pricing information tailored to your requirements, please contact us through our website at www.connexus.ai.
+    • For detailed pricing information tailored to your requirements, please contact us through our website at www.connexus.ai.
     """)
 
 with st.expander("What's the first step in getting started with AI Voice Agents?"):
     st.write("""
-    The best way to begin is by scheduling a free consultation through our website at www.connexus.ai. Our experts will assess your current call operations, identify opportunities for AI implementation, and provide a customized proposal showing expected cost savings and performance improvements specific to your business model.
+    • The best way to begin is by scheduling a free consultation through our website at www.connexus.ai. Our experts will assess your current call operations, identify opportunities for AI implementation, and provide a customized proposal showing expected cost savings and performance improvements specific to your business model.
     """)
 
 # Add some spacing at the bottom
