@@ -95,7 +95,12 @@ def render_banner(metrics: dict):
     ret = metrics.get('return_per_dollar', float('nan'))
     payback = metrics.get('payback_mo_integ', float('nan'))
 
-    banner_net = f"${{int(net):,}}" if math.isfinite(net) else "N/A"
+    # Format the values carefully to avoid f-string confusion
+    if math.isfinite(net):
+        banner_net = f"${int(net):,}"
+    else:
+        banner_net = "N/A"
+        
     banner_ret = f"{ret:,.2f}" if math.isfinite(ret) else "N/A"
     banner_pay = f"{payback:.1f}" if math.isfinite(payback) else "N/A"
 
