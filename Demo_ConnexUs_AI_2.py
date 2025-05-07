@@ -133,62 +133,84 @@ with input_col:
 
 # ─── Results and Graphs (Right Column) ─────────────────────
 with graph_col:
-    # Calculate metrics
-    metrics = calculate_metrics(
-        agents=agents,
-        human_rate=human_rate,
-        burden_pct=burden_pct,
-        talk_pct=talk_pct,
-        hours_per_month=hours_per_month,
-        subscription=subscription,
-        automation_pct=automation_pct,
-        integration_fee=integration_fee,
-        include_indirect=include_indirect,
-        hr_pct=hr_pct,
-    )
+    # Calculate metrics with try/except block to catch any calculation errors
+    try:
+        metrics = calculate_metrics(
+            agents=agents,
+            human_rate=human_rate,
+            burden_pct=burden_pct,
+            talk_pct=talk_pct,
+            hours_per_month=hours_per_month,
+            subscription=subscription,
+            automation_pct=automation_pct,
+            integration_fee=integration_fee,
+            include_indirect=include_indirect,
+            hr_pct=hr_pct,
+        )
+    except Exception as e:
+        st.error(f"Error calculating metrics: {str(e)}")
+        # Create an empty metrics dictionary to prevent downstream errors
+        metrics = {}
     
     # Display the main banner
-    net = metrics.get('net_savings', float('nan'))
-    ret = metrics.get('return_per_dollar', float('nan'))
-    payback = metrics.get('payback_mo_integ', float('nan'))
-    
-    # Format the values carefully to avoid f-string confusion
-    if math.isfinite(net):
-        banner_net = f"${int(net):,}"
-    else:
-        banner_net = "N/A"
+    try:
+        net = metrics.get('net_savings', 0)
+        ret = metrics.get('return_per_dollar', 0)
+        payback = metrics.get('payback_mo_integ', 0)
         
-    banner_ret = f"{ret:,.2f}" if math.isfinite(ret) else "N/A"
-    banner_pay = f"{payback:.1f}" if math.isfinite(payback) else "N/A"
+        # Format the values carefully to avoid f-string confusion
+        if math.isfinite(net) and net is not None:
+            banner_net = f"${int(net):,}"
+        else:
+            banner_net = "$0"
+            
+        banner_ret = f"{ret:,.2f}" if math.isfinite(ret) and ret is not None else "0.00"
+        banner_pay = f"{payback:.1f}" if math.isfinite(payback) and payback is not None else "N/A"
 
-    st.markdown(f"""
-    <div class='banner'>
-      <h2>You'll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
-      <p>For every $1 you spend on AI, you get {banner_ret} back.</p>
-      <p>You'll get your setup money back in {banner_pay} months.</p>
-    </div>
-    """, unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class='banner'>
+          <h2>You'll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
+          <p>For every $1 you spend on AI, you get {banner_ret} back.</p>
+          <p>You'll get your setup money back in {banner_pay} months.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"Error displaying banner: {str(e)}")
+        # Show a simpler banner as fallback
+        st.markdown("""
+        <div class='banner'>
+          <h2>Calculate your AI savings above</h2>
+          <p>Adjust the values on the left to see your potential savings.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     # ─── GRAPH 1: Cost Comparison Bar Chart ─────────────────
     st.subheader("Monthly Cost Comparison")
     
-    fig_cost = go.Figure()
-    fig_cost.add_trace(go.Bar(
-        x=['Current Human Cost', 'AI-Enabled Cost', 'Net Savings'],
-        y=[metrics['baseline_human_cost'], metrics['ai_enabled_cost'], metrics['net_savings']],
-        marker_color=['#ff9e80', '#80cbc4', '#2E7D32']
-    ))
-    fig_cost.update_layout(
-        xaxis_title="Cost Category",
-        yaxis_title="Amount ($)",
-        yaxis_tickprefix="$",
-        plot_bgcolor='rgba(0,0,0,0.1)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='white'),
-        height=300,
-        margin=dict(l=40, r=40, t=30, b=40),
-    )
-    st.plotly_chart(fig_cost, use_container_width=True)
+    try:
+        baseline_cost = metrics.get('baseline_human_cost', 0)
+        ai_enabled_cost = metrics.get('ai_enabled_cost', 0)
+        net_savings = metrics.get('net_savings', 0)
+        
+        fig_cost = go.Figure()
+        fig_cost.add_trace(go.Bar(
+            x=['Current Human Cost', 'AI-Enabled Cost', 'Net Savings'],
+            y=[baseline_cost, ai_enabled_cost, net_savings],
+            marker_color=['#ff9e80', '#80cbc4', '#2E7D32']
+        ))
+        fig_cost.update_layout(
+            xaxis_title="Cost Category",
+            yaxis_title="Amount ($)",
+            yaxis_tickprefix="$",
+            plot_bgcolor='rgba(0,0,0,0.1)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white'),
+            height=300,
+            margin=dict(l=40, r=40, t=30, b=40),
+        )
+        st.plotly_chart(fig_cost, use_container_width=True)
+    except Exception as e:
+        st.warning(f"Could not display Cost Comparison chart: {str(e)}")
     
     # ─── GRAPH 2: ROI Timeline Graph ─────────────────
     st.subheader("Return on Investment Over Time")
@@ -269,89 +291,105 @@ with graph_col:
     with col1:
         st.subheader("Cost Distribution")
         
-        # Data for the pie charts
-        human_costs = [
-            metrics['residual_human_cost'],  # Human cost that remains
-            metrics['productive_cost'] * (automation_pct / 100),  # Human cost replaced by AI
-            metrics['unproductive_cost']  # Unproductive time
-        ]
-        
-        ai_costs = [
-            metrics['residual_human_cost'],  # Human cost that remains
-            metrics['ai_variable_cost'],  # Variable AI cost
-            metrics['subscription']  # Fixed AI subscription
-        ]
-        
-        # Create tabs for the pie charts
-        tab1, tab2 = st.tabs(["Before AI", "After AI"])
-        
-        with tab1:
-            fig_pie1 = go.Figure(data=[go.Pie(
-                labels=['Human Productive', 'Human Unproductive'],
-                values=[metrics['productive_cost'], metrics['unproductive_cost']],
-                hole=.4,
-                marker_colors=['#ff9e80', '#ffcc80']
-            )])
-            fig_pie1.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='white'),
-                height=300,
-                margin=dict(l=20, r=20, t=30, b=20),
-            )
-            st.plotly_chart(fig_pie1, use_container_width=True)
+        try:
+            # Safely extract data for the pie charts with fallbacks
+            residual_human_cost = metrics.get('residual_human_cost', 0)
+            productive_cost = metrics.get('productive_cost', 0)
+            unproductive_cost = metrics.get('unproductive_cost', 0)
+            ai_variable_cost = metrics.get('ai_variable_cost', 0)
+            subscription_cost = subscription  # Use the direct input value
             
-        with tab2:
-            fig_pie2 = go.Figure(data=[go.Pie(
-                labels=['Remaining Human', 'AI Variable', 'AI Subscription'],
-                values=[metrics['residual_human_cost'], metrics['ai_variable_cost'], metrics['subscription']],
-                hole=.4,
-                marker_colors=['#ff9e80', '#80cbc4', '#4db6ac']
-            )])
-            fig_pie2.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='white'),
-                height=300,
-                margin=dict(l=20, r=20, t=30, b=20),
-            )
-            st.plotly_chart(fig_pie2, use_container_width=True)
+            # Calculate replaced cost
+            replaced_cost = productive_cost * (automation_pct / 100) if productive_cost else 0
+            
+            # Create tabs for the pie charts
+            tab1, tab2 = st.tabs(["Before AI", "After AI"])
+            
+            with tab1:
+                # Handle empty or invalid data
+                if productive_cost <= 0 and unproductive_cost <= 0:
+                    st.info("Not enough data to display the cost distribution chart.")
+                else:
+                    fig_pie1 = go.Figure(data=[go.Pie(
+                        labels=['Human Productive', 'Human Unproductive'],
+                        values=[productive_cost, unproductive_cost],
+                        hole=.4,
+                        marker_colors=['#ff9e80', '#ffcc80']
+                    )])
+                    fig_pie1.update_layout(
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        font=dict(color='white'),
+                        height=300,
+                        margin=dict(l=20, r=20, t=30, b=20),
+                    )
+                    st.plotly_chart(fig_pie1, use_container_width=True)
+                
+            with tab2:
+                # Handle empty or invalid data
+                if residual_human_cost <= 0 and ai_variable_cost <= 0 and subscription_cost <= 0:
+                    st.info("Not enough data to display the AI cost distribution chart.")
+                else:
+                    fig_pie2 = go.Figure(data=[go.Pie(
+                        labels=['Remaining Human', 'AI Variable', 'AI Subscription'],
+                        values=[residual_human_cost, ai_variable_cost, subscription_cost],
+                        hole=.4,
+                        marker_colors=['#ff9e80', '#80cbc4', '#4db6ac']
+                    )])
+                    fig_pie2.update_layout(
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        font=dict(color='white'),
+                        height=300,
+                        margin=dict(l=20, r=20, t=30, b=20),
+                    )
+                    st.plotly_chart(fig_pie2, use_container_width=True)
+        except Exception as e:
+            st.warning(f"Could not display Cost Distribution charts: {str(e)}")
     
     # ─── GRAPH 4: Value Component Waterfall Chart ─────────────────
     with col2:
         st.subheader("Total Value Breakdown")
         
-        # Prepare waterfall chart data
-        waterfall_x = ['Net Savings', 'Indirect Savings', 'Strategic Value', 'Total Value']
-        waterfall_y = [
-            metrics['net_savings'], 
-            metrics['indirect_savings'], 
-            metrics['strategic_savings'], 
-            0  # This is a dummy value for the total
-        ]
-        
-        # Create waterfall chart
-        fig_waterfall = go.Figure(go.Waterfall(
-            name="Value Sources", 
-            orientation="v",
-            measure=["relative", "relative", "relative", "total"],
-            x=waterfall_x,
-            y=waterfall_y,
-            connector={"line":{"color":"rgb(63, 63, 63)"}},
-            decreasing={"marker":{"color":"#ff9e80"}},
-            increasing={"marker":{"color":"#4db6ac"}},
-            totals={"marker":{"color":"#76ff03"}},
-        ))
-        
-        fig_waterfall.update_layout(
-            title="",
-            showlegend=False,
-            plot_bgcolor='rgba(0,0,0,0.1)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='white'),
-            height=300,
-            margin=dict(l=20, r=20, t=30, b=40),
-            yaxis_tickprefix="$",
-        )
-        st.plotly_chart(fig_waterfall, use_container_width=True)
+        try:
+            # Safely extract values
+            net_savings = metrics.get('net_savings', 0)
+            indirect_savings = metrics.get('indirect_savings', 0)
+            strategic_savings = metrics.get('strategic_savings', 0)
+            
+            # Prepare waterfall chart data
+            waterfall_x = ['Net Savings', 'Indirect Savings', 'Strategic Value', 'Total Value']
+            waterfall_y = [
+                net_savings, 
+                indirect_savings, 
+                strategic_savings, 
+                0  # This is a dummy value for the total
+            ]
+            
+            # Create waterfall chart
+            fig_waterfall = go.Figure(go.Waterfall(
+                name="Value Sources", 
+                orientation="v",
+                measure=["relative", "relative", "relative", "total"],
+                x=waterfall_x,
+                y=waterfall_y,
+                connector={"line":{"color":"rgb(63, 63, 63)"}},
+                decreasing={"marker":{"color":"#ff9e80"}},
+                increasing={"marker":{"color":"#4db6ac"}},
+                totals={"marker":{"color":"#76ff03"}},
+            ))
+            
+            fig_waterfall.update_layout(
+                title="",
+                showlegend=False,
+                plot_bgcolor='rgba(0,0,0,0.1)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(color='white'),
+                height=300,
+                margin=dict(l=20, r=20, t=30, b=40),
+                yaxis_tickprefix="$",
+            )
+            st.plotly_chart(fig_waterfall, use_container_width=True)
+        except Exception as e:
+            st.warning(f"Could not display Value Breakdown chart: {str(e)}")
 
 # ─── Unit Tests ─────────────────────────────────────
 if not os.getenv('STREAMLIT_RUN'):
