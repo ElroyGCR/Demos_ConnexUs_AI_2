@@ -193,70 +193,75 @@ with graph_col:
     # ─── GRAPH 2: ROI Timeline Graph ─────────────────
     st.subheader("Return on Investment Over Time")
     
-    # Generate timeline data for 24 months
-    months = list(range(1, 25))
-    
-    # Calculate cumulative savings
-    monthly_value = metrics['total_value']
-    initial_investment = metrics['integration_fee']  # Don't negate it here
-    
-    # Create a list with initial investment as negative first value
-    cumulative = [-initial_investment]
-    
-    # Add the monthly savings for each subsequent month
-    for i in range(1, 25):
-        cumulative.append(cumulative[0] + (monthly_value * i))
-    
-    # Remove the first element to match our months list
-    cumulative = cumulative[1:]
-    
-    # Create dataframe for the line chart
-    roi_data = pd.DataFrame({
-        'Month': months,
-        'Cumulative Value': cumulative
-    })
-    
-    # Find break-even point
-    breakeven_month = next((i for i, val in enumerate(cumulative) if val >= 0), None)
-    
-    # Create the ROI timeline chart
-    fig_roi = px.line(
-        roi_data, 
-        x='Month', 
-        y='Cumulative Value',
-        markers=True,
-    )
-    
-    # Add break-even point marker
-    if breakeven_month is not None:
-        fig_roi.add_trace(
-            go.Scatter(
-                x=[breakeven_month + 1], 
-                y=[cumulative[breakeven_month]],
-                mode='markers',
-                marker=dict(size=12, color='#76ff03', line=dict(width=2, color='white')),
-                name='Break-even Point'
-            )
+    try:
+        # Generate timeline data for 24 months
+        months = list(range(1, 25))
+        
+        # Calculate cumulative savings - handle missing values safely
+        monthly_value = metrics.get('total_value', 0)
+        
+        # Check if integration_fee exists and is valid
+        if 'integration_fee' in metrics and isinstance(metrics['integration_fee'], (int, float)):
+            initial_investment = float(metrics['integration_fee'])
+        else:
+            # Use a default or the value from input if metrics doesn't have it
+            initial_investment = integration_fee
+            
+        # Start with negative investment
+        cumulative = []
+        for i in range(len(months)):
+            # For month i, we have the initial negative investment plus i months of positive value
+            cumulative.append(-initial_investment + (monthly_value * (i+1)))
+        
+        # Create dataframe for the line chart
+        roi_data = pd.DataFrame({
+            'Month': months,
+            'Cumulative Value': cumulative
+        })
+        
+        # Find break-even point - the first month where cumulative value becomes positive
+        breakeven_month = next((i for i, val in enumerate(cumulative) if val >= 0), None)
+        
+        # Create the ROI timeline chart
+        fig_roi = px.line(
+            roi_data, 
+            x='Month', 
+            y='Cumulative Value',
+            markers=True,
         )
-    
-    # Add horizontal line at y=0
-    fig_roi.add_shape(
-        type="line", line_color="gray", line_dash="dash",
-        x0=0, x1=24, y0=0, y1=0
-    )
-    
-    fig_roi.update_layout(
-        xaxis_title="Month",
-        yaxis_title="Cumulative Value ($)",
-        yaxis_tickprefix="$",
-        plot_bgcolor='rgba(0,0,0,0.1)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='white'),
-        height=300,
-        margin=dict(l=40, r=40, t=30, b=40),
-    )
-    st.plotly_chart(fig_roi, use_container_width=True)
-    
+        
+        # Add break-even point marker if we found one
+        if breakeven_month is not None:
+            fig_roi.add_trace(
+                go.Scatter(
+                    x=[months[breakeven_month]], 
+                    y=[cumulative[breakeven_month]],
+                    mode='markers',
+                    marker=dict(size=12, color='#76ff03', line=dict(width=2, color='white')),
+                    name='Break-even Point'
+                )
+            )
+        
+        # Add horizontal line at y=0
+        fig_roi.add_shape(
+            type="line", line_color="gray", line_dash="dash",
+            x0=0, x1=24, y0=0, y1=0
+        )
+        
+        fig_roi.update_layout(
+            xaxis_title="Month",
+            yaxis_title="Cumulative Value ($)",
+            yaxis_tickprefix="$",
+            plot_bgcolor='rgba(0,0,0,0.1)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white'),
+            height=300,
+            margin=dict(l=40, r=40, t=30, b=40),
+        )
+        st.plotly_chart(fig_roi, use_container_width=True)
+    except Exception as e:
+        st.warning(f"Could not display ROI Timeline chart: {str(e)}")
+        
     # Create two columns for smaller charts
     col1, col2 = st.columns(2)
     
