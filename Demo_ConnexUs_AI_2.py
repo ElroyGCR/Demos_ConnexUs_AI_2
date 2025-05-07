@@ -510,7 +510,7 @@ with col_text_faq:
 # Header description
 st.markdown("""
 <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-    <p style="color: #ffffff; font-size: 16px; margin: 0;">
+    <p style="color: #ffffff; font-size: 22px; margin: 0;">
         Common questions about AI automation and how it can benefit your contact center operations.
     </p>
 </div>
@@ -521,14 +521,14 @@ st.markdown("### Why Businesses Are Switching to AI Voice Agents")
 
 with st.expander("What exactly is an AI Voice Representative?"):
     st.write("""
-    AI Voice Representatives are cutting-edge virtual agents that revolutionize how businesses handle communications. They conduct remarkably natural phone conversations, answer complex questions, process requests, and deliver consistent excellence 24/7/365. 
+    • AI Voice Representatives are cutting-edge virtual agents that revolutionize how businesses handle communications. They conduct remarkably natural phone conversations, answer complex questions, process requests, and deliver consistent excellence 24/7/365. 
     
-    Unlike human agents who need breaks, vacations, and sick days, our AI Voice Representatives work around the clock with zero downtime, zero turnover, and zero training requirements—transforming your customer service from a cost center into a competitive advantage.
+    • Unlike human agents who need breaks, vacations, and sick days, our AI Voice Representatives work around the clock with zero downtime, zero turnover, and zero training requirements—transforming your customer service from a cost center into a competitive advantage.
     """)
 
 with st.expander("How do AI Voice Agents differ from traditional IVR systems?"):
     st.write("""
-    Unlike traditional IVR systems that force callers through rigid menu trees, our AI Voice Agents engage in natural conversations. They don't just recognize keywords—they understand intent, can handle complex inquiries, and provide personalized responses that sound human, creating a dramatically improved customer experience.
+    • Unlike traditional IVR systems that force callers through rigid menu trees, our AI Voice Agents engage in natural conversations. They don't just recognize keywords—they understand intent, can handle complex inquiries, and provide personalized responses that sound human, creating a dramatically improved customer experience.
     """)
 
 # Category 2: Cost Savings & Operational Efficiency
@@ -536,7 +536,7 @@ st.markdown("### Cost Savings & Operational Efficiency")
 
 with st.expander("What kind of cost savings can I expect?"):
     st.write("""
-    Businesses typically slash communication costs by 50-70% when implementing AI Voice Agents. Beyond the obvious savings on salaries and benefits, you'll eliminate costly overhead from:
+    • Businesses typically slash communication costs by 50-70% when implementing AI Voice Agents. Beyond the obvious savings on salaries and benefits, you'll eliminate costly overhead from:
 
     - **Recruitment & Turnover Costs**: No more spending thousands on hiring replacements for the average 30-45% annual call center attrition
     - **Training Expenses**: Eliminate the 2-6 weeks of paid training for each new agent
