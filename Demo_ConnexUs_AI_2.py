@@ -212,7 +212,7 @@ i1, i2, i3 = st.columns(3)
 with i1:
     st.markdown(metric_block("ROI on Integration (yr)", roi_integ_yr, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 with i2:
-    st.markdown(metric_block("Payback on Int (month(s))", payback_mo_integ, "", "", "{:,.2f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Payback on Int - Month(s)", payback_mo_integ, "", "", "{:,.2f}"), unsafe_allow_html=True)
 with i3:
     # Empty column for balance
     pass
