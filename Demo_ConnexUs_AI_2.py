@@ -202,7 +202,7 @@ with c1:
 with c2:
     st.markdown(metric_block("Total Value (Combined savings)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 with c3:
-    st.markdown(metric_block("Monthly Cost Efficiency", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Monthly Cost Efficiency (Direct Savings ÷ Baseline Cost)", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 
 # Add spacing between the rows of metric cards
 st.write("")
