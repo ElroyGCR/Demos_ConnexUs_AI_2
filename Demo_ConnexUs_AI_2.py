@@ -198,9 +198,9 @@ st.write("These key metrics show your cost savings and the value returned for ev
 # First row - 3 metrics
 c1, c2, c3 = st.columns(3)
 with c1:
-    st.markdown(metric_block("Direct Monthly Savings", direct_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Direct Monthly Savings (Baseline cost - AI-enabled cost)", direct_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 with c2:
-    st.markdown(metric_block("Total Value (Combined savings)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
+    st.markdown(metric_block("Total Savings (Direct + Indirect + HR Strategic)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
 with c3:
     st.markdown(metric_block("Monthly Cost Efficiency (Direct Savings ÷ Baseline Cost)", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
 
