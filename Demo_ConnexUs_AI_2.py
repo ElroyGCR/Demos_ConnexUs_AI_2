@@ -118,8 +118,6 @@ st.sidebar.subheader("🤖 AI Cost Inputs")
 subscription = st.sidebar.number_input("AI Subscription ($/mo)", value=2000, step=100)
 integration_fee = st.sidebar.number_input("Integration Fee ($)", value=15000, step=500)
 ai_cost_min = st.sidebar.number_input("AI Cost per Min ($)", value=0.20, step=0.01)
-# Remove AI Efficiency Amplifier slider and hardcode it to 2.0
-ai_efficiency_factor = 2.0
 automation_pct = st.sidebar.slider("Automation Target (%)", 0, 100, 50, step=5)
 
 st.sidebar.subheader("📈 Value Adders")
@@ -138,25 +136,35 @@ baseline_human_cost = agents * hours_per_month * human_rate * burden_mul
 productive_cost = baseline_human_cost * (talk_pct/100)
 unproductive_cost = baseline_human_cost * (1 - talk_pct/100)
 
+# Calculate total productive minutes (considering utilization)
+total_minutes = agents * hours_per_month * 60  # Total minutes paid for
+productive_minutes = total_minutes * (talk_pct/100)  # Actual productive minutes
+
 # AI and human costs at the automation level
 residual_human_cost = baseline_human_cost * (1 - automation_pct/100)
 
-# AI cost based on talk time (productive time), adjusted for efficiency (fixed at 2.0)
-# More efficient means AI costs less to do the same amount of work
-ai_variable_cost = (productive_cost * (automation_pct/100)) / ai_efficiency_factor
+# AI costs - based on productive minutes only
+ai_minutes = productive_minutes * (automation_pct/100)  # Minutes handled by AI
+ai_variable_cost = ai_minutes * (ai_cost_min/60)  # Cost of AI usage
 
 # Total AI-enabled cost
 ai_enabled_cost = residual_human_cost + ai_variable_cost + subscription
 
+# Utilization adjustment savings (critical new component)
+# Since humans are paid for all time but AI only for productive time
+# The effective human equivalent cost would be higher for the same productive output
+human_equivalent_minutes = ai_minutes / (talk_pct/100)  # Minutes humans would need to be paid for
+human_equivalent_cost = (human_equivalent_minutes/60) * human_rate * burden_mul
+utilization_savings = human_equivalent_cost - (ai_minutes * (ai_cost_min/60))
+
 # Net savings (renamed to Direct savings in the UI)
-direct_savings = baseline_human_cost - ai_enabled_cost
+direct_savings = baseline_human_cost - ai_enabled_cost + utilization_savings
 
 # Monthly cost efficiency
 monthly_cost_efficiency = (direct_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
 
-# Indirect savings based on unproductive cost, enhanced by AI efficiency (fixed at 2.0)
-# AI efficiency means greater impact on reducing unproductive time
-indirect_savings = unproductive_cost * (automation_pct/100) * ai_efficiency_factor if include_indirect else 0
+# Indirect savings based on unproductive cost
+indirect_savings = unproductive_cost * (automation_pct/100) if include_indirect else 0
 
 # Strategic HR savings if included
 strategic_savings = indirect_savings * (hr_pct/100) if include_hr else 0
@@ -239,8 +247,8 @@ st.markdown(f"""
 with st.expander("ℹ️ How are these metrics calculated?"):
     st.subheader("Direct Savings Metrics")
     st.write("**Direct Monthly Savings**: The total monthly cost reduction achieved by implementing AI.")
-    st.write("- Calculated as: Baseline human cost minus AI-enabled cost")
-    st.write("- Formula: Agents × Hours × Rate × Burden - (Remaining Human Cost + AI Cost + Subscription)")
+    st.write("- Calculated as: Baseline human cost minus AI-enabled cost, plus utilization efficiency")
+    st.write("- Formula: Agents × Hours × Rate × Burden - (Remaining Human Cost + AI Cost + Subscription) + Utilization Savings")
     
     st.write("**Monthly Cost Efficiency**: The percentage of baseline costs saved through AI implementation.")
     st.write("- Formula: Direct Savings ÷ Baseline Cost × 100")
@@ -272,6 +280,13 @@ with st.expander("ℹ️ How are these metrics calculated?"):
     st.write("*Note: This is a monthly return figure, meaning your annual return would be approximately 12 times this amount for every dollar invested.*")
     
     st.write("**What this means for your business:** This is perhaps the most compelling metric for financial decision makers. This return far exceeds most technology investments, which typically return $1.30-$2.50. This positions AI automation as one of the highest-ROI technologies available to contact centers today.")
+    
+    st.subheader("Utilization Efficiency")
+    st.write("**A key advantage of AI is utilization efficiency**: Humans are paid for all hours whether productive or not, while AI is only paid for actual productive time.")
+    st.write("- With agent utilization at {:.0f}%, for every hour of productive work, you pay humans for {:.2f} hours".format(talk_pct, 100/talk_pct))
+    st.write("- AI is charged only for the minutes it's actually working - 100% utilization")
+    st.write("- This creates significant additional savings beyond the simple cost comparison")
+    st.write("- **Formula**: (AI Minutes ÷ Utilization Rate × Hourly Rate × Burden) - AI Minutes × AI Cost Per Minute")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────
 st.write("## Human vs Hybrid Cost Comparison")
@@ -306,6 +321,13 @@ fig1.add_trace(go.Bar(
     marker_color="#FFAB91",
 ))
 
+# Add utilization savings as a negative bar (cost reduction)
+fig1.add_trace(go.Bar(
+    name="Utilization Savings",
+    x=cats, y=[0, -utilization_savings],  # Negative to show as cost reduction
+    marker_color="#4CAF50",
+))
+
 fig1.update_layout(
     barmode="stack",
     xaxis_title="",
@@ -326,10 +348,12 @@ with st.expander("ℹ️ How to read this cost comparison"):
     st.write("  - **Remaining Human**: Remaining human agent costs")
     st.write("  - **AI Usage**: Variable AI costs based on usage")
     st.write("  - **Subscription**: Fixed monthly AI platform fee")
+    st.write("  - **Utilization Savings**: Additional savings from AI's 100% utilization vs. human's lower utilization")
     
     st.subheader("Why this matters to your business:")
     st.write("- **Immediate cost reduction**: AI implementation delivers substantial cost savings from day one")
     st.write("- **Predictable costs**: AI costs are more stable and predictable than human staffing costs")
+    st.write("- **Utilization advantage**: AI only charges for productive time, while humans are paid regardless of utilization")
     st.write("- **Scalability**: AI can easily scale up or down without the hiring/firing cycles of traditional contact centers")
     st.write("- **Reduced fixed costs**: Converting fixed costs (full-time employees) to variable costs (AI usage) improves financial flexibility")
     st.write("- **Lower operational risk**: AI reduces dependency on labor market conditions and staffing challenges")
@@ -347,10 +371,19 @@ left, right = st.columns([3, 1], gap="medium")
 with left:
     fig2 = go.Figure()
     
+    # Split direct savings into base savings and utilization savings
+    base_direct_savings = baseline_human_cost - ai_enabled_cost
+    
     fig2.add_trace(go.Bar(
-        name="Direct Savings",
-        x=["Savings"], y=[direct_savings],
+        name="Base Direct Savings",
+        x=["Savings"], y=[base_direct_savings],
         marker_color="#66BB6A"
+    ))
+    
+    fig2.add_trace(go.Bar(
+        name="Utilization Savings",
+        x=["Savings"], y=[utilization_savings],
+        marker_color="#81C784"
     ))
 
     if include_indirect:
@@ -387,7 +420,8 @@ with right:
         row-gap: 10px;
         margin-top: 10px;
     '>
-      {metric_block("Direct Savings", direct_savings, "$", "", "{:,.0f}")}
+      {metric_block("Base Direct Savings", base_direct_savings, "$", "", "{:,.0f}")}
+      {metric_block("Utilization Savings", utilization_savings, "$", "", "{:,.0f}")}
       {metric_block("Indirect Savings", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
       {metric_block("HR Strategic", strategic_savings, "$", "", "{:,.0f}") if include_hr else ""}
     </div>
@@ -398,7 +432,8 @@ with right:
 with st.expander("ℹ️ Understanding the savings breakdown"):
     st.subheader("Total Monthly Value")
     st.write("This stacked chart shows how your total monthly value is composed of different types of savings:")
-    st.write("- **Direct Savings**: Direct operational cost reduction from implementing AI")
+    st.write("- **Base Direct Savings**: Direct operational cost reduction from implementing AI")
+    st.write("- **Utilization Savings**: Additional savings from AI's 100% utilization vs. human's partial utilization")
     st.write("- **Indirect Savings**: Productivity improvements and reduction in unproductive time")
     st.write("- **HR Strategic Impact**: Higher-order benefits from improved workforce management")
     
