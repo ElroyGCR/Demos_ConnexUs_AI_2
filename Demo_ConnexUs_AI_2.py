@@ -118,8 +118,9 @@ st.sidebar.subheader("🤖 AI Cost Inputs")
 subscription = st.sidebar.number_input("AI Subscription ($/mo)", value=2000, step=100)
 integration_fee = st.sidebar.number_input("Integration Fee ($)", value=15000, step=500)
 ai_cost_min = st.sidebar.number_input("AI Cost per Min ($)", value=0.20, step=0.01)
-# Hardcoding AI Efficiency Amplifier to 2.0 and removing the slider
-ai_amplifier = 2.0
+# Add the AI Amplifier slider
+ai_amplifier = st.sidebar.slider("AI Efficiency Amplifier", 0.0, 10.0, 2.0, step=0.5, 
+                                help="How many times more efficient AI is compared to humans. Higher values mean AI can do more work at lower cost.")
 automation_pct = st.sidebar.slider("Automation Target (%)", 0, 100, 50, step=5)
 
 st.sidebar.subheader("📈 Value Adders")
@@ -138,7 +139,7 @@ baseline_human_cost = agents * hours_per_month * human_rate * burden_mul
 productive_cost = baseline_human_cost * (talk_pct/100)
 unproductive_cost = baseline_human_cost * (1 - talk_pct/100)
 
-# AI efficiency factor - Using the hardcoded value of 2.0 instead of the slider value
+# AI efficiency factor - Using the slider value instead of hardcoded 2.0
 ai_efficiency_factor = ai_amplifier if ai_amplifier > 0 else 0.1  # Ensure we don't divide by zero
 
 # AI and human costs at the automation level
