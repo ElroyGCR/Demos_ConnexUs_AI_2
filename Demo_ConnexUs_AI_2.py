@@ -121,7 +121,7 @@ agents = st.sidebar.number_input("Agents (FTE)", min_value=1, value=15, step=1)
 human_rate = st.sidebar.number_input("Human Hourly Cost ($)", min_value=5.0, value=12.0, step=1.0)
 burden_pct = st.sidebar.slider("Labor Burden (including benefits, taxes, and other expenses %)​", 0, 75, 35, step=5)
 talk_pct = st.sidebar.slider("Talk Utilization (%)", 1, 100, 40, step=5)  # Minimum value set to 1 to avoid division by zero
-hours_per_month = st.sidebar.number_input("Hours per Agent / Month", value=172, step=1.0)
+hours_per_month = st.sidebar.number_input("Hours per Agent / Month", value=173.2, step=1.0)
 
 st.sidebar.subheader("🤖 AI Cost Inputs")
 subscription = st.sidebar.number_input("AI Subscription ($/mo)", value=2000, step=100)
