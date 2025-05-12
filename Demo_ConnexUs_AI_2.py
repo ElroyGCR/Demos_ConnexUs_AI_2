@@ -132,8 +132,8 @@ automation_pct = st.sidebar.slider("Automation Target (%)", 0, 100, 50, step=5)
 st.sidebar.subheader("📈 Value Adders")
 include_indirect = st.sidebar.checkbox("Include Indirect Value", value=True)
 production_pct = st.sidebar.slider("Production Improvement (%)", 0, 100, 0, step=5)  # Default set to 0
-include_hr = st.sidebar.checkbox("Include HR Strategic Impact", value=False)
-hr_pct = st.sidebar.slider("HR Impact (%)", 0, 50, 10, step=5) if include_hr else 0
+include_hr = st.sidebar.checkbox("Include HR Strategic Impact", value=False)  # Default unchecked
+hr_pct = st.sidebar.slider("HR Impact (%)", 0, 50, 0, step=5) if include_hr else 0  # Default set to 0
 
 # ─── Core Calculations ─────────────────────────────────
 burden_mul = 1 + burden_pct/100
@@ -385,13 +385,7 @@ fig1.add_trace(go.Bar(
     marker_color="#4CAF50",
 ))
 
-# Show production improvement if enabled
-if production_pct > 0:
-    fig1.add_trace(go.Bar(
-        name="Production Improvement",
-        x=cats, y=[0, -production_impact],  # Negative to show as additional value
-        marker_color="#8BC34A",
-    ))
+# Removed Production Improvement from the cost comparison chart as requested
 
 fig1.update_layout(
     barmode="stack",
@@ -414,8 +408,6 @@ with st.expander("ℹ️ How to read this cost comparison"):
     st.write("  - **AI Usage**: Variable AI costs based on usage")
     st.write("  - **Subscription**: Fixed monthly AI platform fee")
     st.write("  - **Utilization Savings**: Additional savings from AI's 100% utilization vs. human's lower utilization")
-    if production_pct > 0:
-        st.write("  - **Production Improvement**: Additional value from increased productivity with AI automation")
     
     st.subheader("Why this matters to your business:")
     st.write("- **Immediate cost reduction**: AI implementation delivers substantial cost savings from day one")
