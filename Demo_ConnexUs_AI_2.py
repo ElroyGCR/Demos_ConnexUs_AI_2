@@ -118,8 +118,6 @@ st.sidebar.subheader("🤖 AI Cost Inputs")
 subscription = st.sidebar.number_input("AI Subscription ($/mo)", value=2000, step=100)
 integration_fee = st.sidebar.number_input("Integration Fee ($)", value=15000, step=500)
 ai_cost_min = st.sidebar.number_input("AI Cost per Min ($)", value=0.20, step=0.01)
-# Remove AI Efficiency Amplifier slider and hardcode it to 2.0
-ai_efficiency_factor = 2.0
 automation_pct = st.sidebar.slider("Automation Target (%)", 0, 100, 50, step=5)
 
 st.sidebar.subheader("📈 Value Adders")
@@ -141,9 +139,9 @@ unproductive_cost = baseline_human_cost * (1 - talk_pct/100)
 # AI and human costs at the automation level
 residual_human_cost = baseline_human_cost * (1 - automation_pct/100)
 
-# AI cost based on talk time (productive time), adjusted for efficiency (fixed at 2.0)
-# More efficient means AI costs less to do the same amount of work
-ai_variable_cost = (productive_cost * (automation_pct/100)) / ai_efficiency_factor
+# AI cost based on talk time (productive time)
+# No efficiency factor applied - AI costs the same as humans
+ai_variable_cost = productive_cost * (automation_pct/100)
 
 # Total AI-enabled cost
 ai_enabled_cost = residual_human_cost + ai_variable_cost + subscription
@@ -154,9 +152,9 @@ direct_savings = baseline_human_cost - ai_enabled_cost
 # Monthly cost efficiency
 monthly_cost_efficiency = (direct_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
 
-# Indirect savings based on unproductive cost, enhanced by AI efficiency (fixed at 2.0)
-# AI efficiency means greater impact on reducing unproductive time
-indirect_savings = unproductive_cost * (automation_pct/100) * ai_efficiency_factor if include_indirect else 0
+# Indirect savings based on unproductive cost
+# No efficiency factor applied
+indirect_savings = unproductive_cost * (automation_pct/100) if include_indirect else 0
 
 # Strategic HR savings if included
 strategic_savings = indirect_savings * (hr_pct/100) if include_hr else 0
