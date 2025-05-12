@@ -120,7 +120,7 @@ st.sidebar.header("⚙️ Inputs")
 agents = st.sidebar.number_input("Agents (FTE)", min_value=1, value=15, step=1)
 human_rate = st.sidebar.number_input("Human Hourly Cost ($)", min_value=5.0, value=12.0, step=1.0)
 burden_pct = st.sidebar.slider("Labor Burden (including benefits, taxes, and other expenses %)​", 0, 75, 35, step=5)
-talk_pct = st.sidebar.slider("Talk Utilization (%)", 0, 100, 40, step=5)
+talk_pct = st.sidebar.slider("Talk Utilization (%)", 1, 100, 40, step=5)  # Minimum value set to 1 to avoid division by zero
 hours_per_month = st.sidebar.number_input("Hours per Agent / Month", value=173.2, step=1.0)
 
 st.sidebar.subheader("🤖 AI Cost Inputs")
@@ -131,7 +131,7 @@ automation_pct = st.sidebar.slider("Automation Target (%)", 0, 100, 50, step=5)
 
 st.sidebar.subheader("📈 Value Adders")
 include_indirect = st.sidebar.checkbox("Include Indirect Value", value=True)
-production_pct = st.sidebar.slider("Production Improvement (%)", 0, 100, 25, step=5)
+production_pct = st.sidebar.slider("Production Improvement (%)", 0, 100, 0, step=5)  # Default set to 0
 include_hr = st.sidebar.checkbox("Include HR Strategic Impact", value=False)
 hr_pct = st.sidebar.slider("HR Impact (%)", 0, 50, 10, step=5) if include_hr else 0
 
@@ -166,7 +166,10 @@ ai_enabled_cost = residual_human_cost + ai_variable_cost + subscription
 # Calculate utilization savings more conservatively
 # The utilization advantage is that AI only gets paid for productive time
 # We calculate what it would cost for humans to handle the same productive minutes
-human_cost_per_productive_hour = (human_rate * burden_mul) / (talk_pct/100)
+
+# Fix the divide by zero issue by ensuring talk_pct is at least 1
+effective_talk_pct = max(1, talk_pct)  # Use at least 1% to avoid division by zero
+human_cost_per_productive_hour = (human_rate * burden_mul) / (effective_talk_pct/100)
 ai_cost_per_productive_hour = ai_cost_min * 60  # AI cost per productive hour
 
 # Calculate the utilization advantage per productive hour
@@ -182,6 +185,13 @@ utilization_savings = hourly_utilization_advantage * ai_productive_hours * scali
 direct_savings_raw = baseline_human_cost - ai_enabled_cost
 direct_savings = direct_savings_raw * scaling_factor
 
+# Add production improvement impact (connecting the slider)
+production_impact = 0
+if production_pct > 0:
+    # Production improvement increases the effective value of automation
+    # by making the automated portion more valuable
+    production_impact = (baseline_human_cost * (automation_pct/100)) * (production_pct/100) * scaling_factor
+
 # Monthly cost efficiency
 monthly_cost_efficiency = (direct_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
 
@@ -191,8 +201,8 @@ indirect_savings = unproductive_cost * (automation_pct/100) * scaling_factor if 
 # Strategic HR savings if included
 strategic_savings = indirect_savings * (hr_pct/100) if include_hr else 0
 
-# Value basis (including utilization savings)
-value_basis = direct_savings + utilization_savings + indirect_savings + strategic_savings
+# Value basis (including utilization savings and production impact)
+value_basis = direct_savings + utilization_savings + indirect_savings + strategic_savings + production_impact
 
 # Cap the value basis relative to baseline cost to ensure realistic results
 max_value_basis = baseline_human_cost * 0.5  # Cap at 50% of baseline cost
@@ -309,7 +319,7 @@ with st.expander("ℹ️ How are these metrics calculated?"):
     
     st.subheader("Total Value")
     st.write("**Total Value (Combined)**: The combined total of all direct and indirect savings.")
-    st.write("- Formula: Direct Savings + Utilization Savings + Indirect Savings + Strategic Savings")
+    st.write("- Formula: Direct Savings + Utilization Savings + Indirect Savings + Strategic Savings + Production Improvement")
     st.write("- **What it means**: This represents the total financial impact of implementing AI across your organization, including both immediate cost savings and broader operational improvements.")
     
     st.subheader("AI Investment Return")
@@ -325,9 +335,15 @@ with st.expander("ℹ️ How are these metrics calculated?"):
     
     st.subheader("Utilization Efficiency")
     st.write("**A key advantage of AI is utilization efficiency**: Humans are paid for all hours whether productive or not, while AI is only paid for actual productive time.")
-    st.write("- With agent utilization at {:.0f}%, for every hour of productive work, you pay humans for {:.2f} hours".format(talk_pct, 100/talk_pct))
+    st.write("- With agent utilization at {:.0f}%, for every hour of productive work, you pay humans for {:.2f} hours".format(talk_pct, 100/max(1, talk_pct)))
     st.write("- AI is charged only for the minutes it's actually working - 100% utilization")
     st.write("- This creates significant additional savings beyond the simple cost comparison")
+    
+    if production_pct > 0:
+        st.subheader("Production Improvement")
+        st.write(f"**The production improvement of {production_pct}%** increases the effective value of automation by making each automated interaction more valuable.")
+        st.write("- This could represent improved customer satisfaction, higher conversion rates, or reduced errors")
+        st.write("- The impact is calculated as a percentage increase in the value of the automated portion of work")
 
 # ─── Human vs Hybrid Cost Comparison ───────────────────
 st.write("## Human vs Hybrid Cost Comparison")
@@ -369,6 +385,14 @@ fig1.add_trace(go.Bar(
     marker_color="#4CAF50",
 ))
 
+# Show production improvement if enabled
+if production_pct > 0:
+    fig1.add_trace(go.Bar(
+        name="Production Improvement",
+        x=cats, y=[0, -production_impact],  # Negative to show as additional value
+        marker_color="#8BC34A",
+    ))
+
 fig1.update_layout(
     barmode="stack",
     xaxis_title="",
@@ -390,6 +414,8 @@ with st.expander("ℹ️ How to read this cost comparison"):
     st.write("  - **AI Usage**: Variable AI costs based on usage")
     st.write("  - **Subscription**: Fixed monthly AI platform fee")
     st.write("  - **Utilization Savings**: Additional savings from AI's 100% utilization vs. human's lower utilization")
+    if production_pct > 0:
+        st.write("  - **Production Improvement**: Additional value from increased productivity with AI automation")
     
     st.subheader("Why this matters to your business:")
     st.write("- **Immediate cost reduction**: AI implementation delivers substantial cost savings from day one")
@@ -423,6 +449,14 @@ with left:
         x=["Savings"], y=[utilization_savings],
         marker_color="#81C784"
     ))
+
+    # Add production improvement to the chart if enabled
+    if production_pct > 0:
+        fig2.add_trace(go.Bar(
+            name="Production Improvement",
+            x=["Savings"], y=[production_impact],
+            marker_color="#8BC34A"
+        ))
 
     if include_indirect:
         fig2.add_trace(go.Bar(
@@ -460,6 +494,7 @@ with right:
     '>
       {metric_block("Direct Savings", direct_savings, "$", "", "{:,.0f}")}
       {metric_block("Utilization Savings", utilization_savings, "$", "", "{:,.0f}")}
+      {metric_block("Production Improvement", production_impact, "$", "", "{:,.0f}") if production_pct > 0 else ""}
       {metric_block("Indirect Savings", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
       {metric_block("HR Strategic", strategic_savings, "$", "", "{:,.0f}") if include_hr else ""}
     </div>
@@ -472,6 +507,8 @@ with st.expander("ℹ️ Understanding the savings breakdown"):
     st.write("This stacked chart shows how your total monthly value is composed of different types of savings:")
     st.write("- **Direct Savings**: Direct operational cost reduction from implementing AI")
     st.write("- **Utilization Savings**: Additional savings from AI's 100% utilization vs. human's partial utilization")
+    if production_pct > 0:
+        st.write(f"- **Production Improvement**: Value gained from the {production_pct}% improvement in productivity with AI")
     st.write("- **Indirect Savings**: Productivity improvements and reduction in unproductive time")
     st.write("- **HR Strategic Impact**: Higher-order benefits from improved workforce management")
     
@@ -481,7 +518,7 @@ with st.expander("ℹ️ Understanding the savings breakdown"):
     st.write("- **Long-term impact**: Indirect benefits often increase over time as AI becomes more integrated")
     st.write("- **Competitive advantage**: Organizations that understand total value gain a strategic edge over competitors only focused on direct costs")
     
-    st.write("**Decision-making guidance:** When evaluating AI automation, consider all three value components. A solution that delivers higher total value, even at slightly higher implementation cost, will typically provide better long-term returns than a cheaper solution with lower indirect benefits.")
+    st.write("**Decision-making guidance:** When evaluating AI automation, consider all value components. A solution that delivers higher total value, even at slightly higher implementation cost, will typically provide better long-term returns than a cheaper solution with lower indirect benefits.")
     
     st.write("*Note: Toggle the \"Include Indirect Value\" and \"Include HR Strategic Impact\" options in the sidebar to see how these additional value components affect your overall ROI.*")
 
