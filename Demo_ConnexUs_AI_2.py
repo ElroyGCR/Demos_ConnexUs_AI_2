@@ -118,8 +118,10 @@ st.sidebar.subheader("🤖 AI Cost Inputs")
 subscription = st.sidebar.number_input("AI Subscription ($/mo)", value=2000, step=100)
 integration_fee = st.sidebar.number_input("Integration Fee ($)", value=15000, step=500)
 ai_cost_min = st.sidebar.number_input("AI Cost per Min ($)", value=0.20, step=0.01)
-# Remove AI Efficiency Amplifier slider and hardcode it to 2.0
-ai_efficiency_factor = 2.0
+# Hardcode AI Efficiency Factor to 0.0 (with a minimum value for calculations to avoid division by zero)
+ai_efficiency_factor_raw = 0.0
+# For calculations, we need to use a small number instead of 0 to avoid division by zero
+ai_efficiency_factor = 0.001 if ai_efficiency_factor_raw == 0 else ai_efficiency_factor_raw
 automation_pct = st.sidebar.slider("Automation Target (%)", 0, 100, 50, step=5)
 
 st.sidebar.subheader("📈 Value Adders")
@@ -141,8 +143,8 @@ unproductive_cost = baseline_human_cost * (1 - talk_pct/100)
 # AI and human costs at the automation level
 residual_human_cost = baseline_human_cost * (1 - automation_pct/100)
 
-# AI cost based on talk time (productive time), adjusted for efficiency (fixed at 2.0)
-# More efficient means AI costs less to do the same amount of work
+# AI cost based on talk time (productive time), adjusted for efficiency
+# With near-zero efficiency, AI costs will be extremely high
 ai_variable_cost = (productive_cost * (automation_pct/100)) / ai_efficiency_factor
 
 # Total AI-enabled cost
@@ -154,8 +156,8 @@ direct_savings = baseline_human_cost - ai_enabled_cost
 # Monthly cost efficiency
 monthly_cost_efficiency = (direct_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
 
-# Indirect savings based on unproductive cost, enhanced by AI efficiency (fixed at 2.0)
-# AI efficiency means greater impact on reducing unproductive time
+# Indirect savings based on unproductive cost, enhanced by AI efficiency
+# With ai_efficiency_factor at near-zero, there will be almost no indirect savings
 indirect_savings = unproductive_cost * (automation_pct/100) * ai_efficiency_factor if include_indirect else 0
 
 # Strategic HR savings if included
@@ -164,7 +166,7 @@ strategic_savings = indirect_savings * (hr_pct/100) if include_hr else 0
 # Value basis
 value_basis = direct_savings + indirect_savings + strategic_savings
 
-# ROI and payback calculations
+# ROI and payback calculations - may be negative with ai_efficiency_factor near zero
 roi_integ_mo = (value_basis / integration_fee) * 100 if integration_fee > 0 else 0
 roi_integ_yr = roi_integ_mo * 12
 payback_mo_integ = integration_fee / value_basis if value_basis > 0 else float('inf')
