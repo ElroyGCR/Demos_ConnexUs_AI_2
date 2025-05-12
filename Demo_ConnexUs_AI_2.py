@@ -120,7 +120,12 @@ st.sidebar.header("⚙️ Inputs")
 agents = st.sidebar.number_input("Agents (FTE)", min_value=1, value=15, step=1)
 human_rate = st.sidebar.number_input("Human Hourly Cost ($)", min_value=5.0, value=12.0, step=1.0)
 burden_pct = st.sidebar.slider("Labor Burden (including benefits, taxes, and other expenses %)​", 0, 75, 35, step=5)
-talk_pct = st.sidebar.slider("Talk Utilization (%)", 1, 100, 40, step=5)  # Minimum value set to 1 to avoid division by zero
+
+# Modified Talk Utilization slider to start at 5% and increment by 5%
+talk_pct = st.sidebar.slider("Talk Utilization (%)", 5, 100, 40, step=5)
+# For calculations, we still need to handle the case where talk_pct could be very low
+effective_talk_pct = max(1, talk_pct)  # Ensure minimum 1% to avoid division by zero
+
 hours_per_month = st.sidebar.number_input("Hours per Agent / Month", value=173.2, step=1.0)
 
 st.sidebar.subheader("🤖 AI Cost Inputs")
@@ -163,12 +168,7 @@ ai_variable_cost = ai_minutes * (ai_cost_min/60)  # Cost of AI usage
 # Total AI-enabled cost (before utilization adjustment)
 ai_enabled_cost = residual_human_cost + ai_variable_cost + subscription
 
-# Calculate utilization savings more conservatively
-# The utilization advantage is that AI only gets paid for productive time
-# We calculate what it would cost for humans to handle the same productive minutes
-
-# Fix the divide by zero issue by ensuring talk_pct is at least 1
-effective_talk_pct = max(1, talk_pct)  # Use at least 1% to avoid division by zero
+# Calculate utilization savings - using effective_talk_pct for safety
 human_cost_per_productive_hour = (human_rate * burden_mul) / (effective_talk_pct/100)
 ai_cost_per_productive_hour = ai_cost_min * 60  # AI cost per productive hour
 
@@ -333,7 +333,7 @@ with st.expander("ℹ️ How are these metrics calculated?"):
     
     st.subheader("Utilization Efficiency")
     st.write("**A key advantage of AI is utilization efficiency**: Humans are paid for all hours whether productive or not, while AI is only paid for actual productive time.")
-    st.write("- With agent utilization at {:.0f}%, for every hour of productive work, you pay humans for {:.2f} hours".format(talk_pct, 100/max(1, talk_pct)))
+    st.write("- With agent utilization at {:.0f}%, for every hour of productive work, you pay humans for {:.2f} hours".format(talk_pct, 100/effective_talk_pct))
     st.write("- AI is charged only for the minutes it's actually working - 100% utilization")
     st.write("- This creates significant additional savings beyond the simple cost comparison")
     
