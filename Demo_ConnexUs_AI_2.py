@@ -1,224 +1,103 @@
-# Streamlit AI Savings Calculator
-# -----------------------------------
-# This script optionally uses Streamlit. If Streamlit isn't installed, a stub interface will be used to allow unit tests to run.
-
 import sys
-import os
-import math
 import types
+# Stub out missing micropip module to prevent import errors in sandbox
+sys.modules['micropip'] = types.ModuleType('micropip')
 
-# Attempt to import Streamlit; if unavailable, create a stub for testing
-try:
-    import streamlit as st
-    STREAMLIT_AVAILABLE = True
-except ImportError:
-    STREAMLIT_AVAILABLE = False
-    # Stub implementations for Streamlit functions
-    st = types.SimpleNamespace(
-        sidebar=types.SimpleNamespace(
-            text_input=lambda label, value=None: value
-        ),
-        set_page_config=lambda *args, **kwargs: None,
-        markdown=lambda *args, **kwargs: None,
-        columns=lambda *args, **kwargs: ([], []),
-        header=lambda *args, **kwargs: None,
-        number_input=lambda label, min_value=None, value=None, step=None: value,
-        slider=lambda label, min_value, max_value, value=None, step=None: value,
-        checkbox=lambda label, value=False: value,
-    )
+import streamlit as st
+
+# ─── Page Config ───────────────────────────────────────
+st.set_page_config(page_title="AI Savings Calculator", layout="wide", page_icon="💰")
 
 # ─── Calculation Logic ─────────────────────────────────
-
 def calculate_metrics(
-    agents: int,
-    human_rate: float,
-    burden_pct: float,
-    talk_pct: float,
-    hours_per_month: float,
-    subscription: float,
-    automation_pct: float,
-    integration_fee: float,
-    include_indirect: bool,
-    hr_pct: float,
-    ai_efficiency_factor: float = 2.0
-) -> dict:
-    """
-    Compute AI savings metrics based on inputs.
+    agents, human_rate, burden_pct, talk_pct, hours_per_month,
+    subscription, ai_cost_min, ai_speed, automation_pct,
+    integration_fee, include_indirect, hr_pct
+):
+    # Validate ai_speed
+    if ai_speed <= 0:
+        st.error("AI Speed Factor must be greater than zero. Using 1 as fallback.")
+        ai_speed = 1
 
-    Returns a dict with keys for all core metrics.
-    """
+    # Baseline human cost including benefits
     burden_mul = 1 + burden_pct / 100
     baseline = agents * hours_per_month * human_rate * burden_mul
-    productive = baseline * (talk_pct / 100)
-    unproductive = baseline * (1 - talk_pct / 100)
+
+    # Human residual cost after AI handles part
     residual = baseline * (1 - automation_pct / 100)
-    ai_variable = (productive * (automation_pct / 100)) / ai_efficiency_factor
-    ai_enabled = residual + ai_variable + subscription
-    net_savings = baseline - ai_enabled
-    monthly_eff = (net_savings / baseline) * 100 if baseline > 0 else float('nan')
-    indirect = unproductive * (automation_pct / 100) * ai_efficiency_factor if include_indirect else 0.0
-    strategic = indirect * (hr_pct / 100) if include_indirect else 0.0
+
+    # AI variable cost via minutes and speed factor
+    talk_hours_total = agents * hours_per_month * (talk_pct / 100)
+    ai_hours = talk_hours_total * (automation_pct / 100)
+    minutes_handled = ai_hours * 60
+    raw_ai_cost = minutes_handled * ai_cost_min
+    ai_variable = raw_ai_cost / ai_speed
+
+    # Net savings
+    ai_enabled_cost = residual + ai_variable + subscription
+    net_savings = baseline - ai_enabled_cost
+
+    # Indirect & strategic savings
+    indirect = 0.0
+    strategic = 0.0
+    if include_indirect:
+        indirect = baseline * (1 - talk_pct / 100) * (automation_pct / 100) * ai_speed
+        strategic = indirect * (hr_pct / 100)
     total_value = net_savings + indirect + strategic
-    roi_integ_mo = (total_value / integration_fee) * 100 if integration_fee > 0 else float('nan')
-    roi_integ_yr = roi_integ_mo * 12 if math.isfinite(roi_integ_mo) else float('nan')
-    payback_integ = integration_fee / total_value if total_value > 0 else float('nan')
-    roi_prod_mo = (total_value / baseline) * 100 if baseline > 0 else float('nan')
-    payback_prod = baseline / total_value if total_value > 0 else float('nan')
+
+    # Return and payback
     ai_spend = subscription + ai_variable
-    return_per = total_value / ai_spend if ai_spend > 0 else float('nan')
+    return_per_dollar = total_value / ai_spend if ai_spend > 0 else 0.0
+    payback_months = integration_fee / total_value if total_value > 0 else float('inf')
 
-    return {
-        'burden_mul': burden_mul,
-        'baseline_human_cost': baseline,
-        'productive_cost': productive,
-        'unproductive_cost': unproductive,
-        'residual_human_cost': residual,
-        'ai_variable_cost': ai_variable,
-        'ai_enabled_cost': ai_enabled,
-        'net_savings': net_savings,
-        'monthly_cost_efficiency': monthly_eff,
-        'indirect_savings': indirect,
-        'strategic_savings': strategic,
-        'total_value': total_value,
-        'roi_integ_mo': roi_integ_mo,
-        'roi_integ_yr': roi_integ_yr,
-        'payback_mo_integ': payback_integ,
-        'roi_prod_mo': roi_prod_mo,
-        'payback_mo_prod': payback_prod,
-        'ai_spend': ai_spend,
-        'return_per_dollar': return_per,
-    }
+    return net_savings, return_per_dollar, payback_months
 
-# ─── Banner Rendering ──────────────────────────────────
+# ─── App Layout ────────────────────────────────────────
+st.title("AI Savings Calculator")
 
-def render_banner(metrics: dict):
-    """
-    Display the main savings banner with checks for invalid values.
-    """
-    net = metrics.get('net_savings', float('nan'))
-    ret = metrics.get('return_per_dollar', float('nan'))
-    payback = metrics.get('payback_mo_integ', float('nan'))
+input_col, result_col = st.columns([2, 3])
 
-    banner_net = f"${{int(net):,}}" if math.isfinite(net) else "N/A"
-    banner_ret = f"{ret:,.2f}" if math.isfinite(ret) else "N/A"
-    banner_pay = f"{payback:.1f}" if math.isfinite(payback) else "N/A"
+with input_col:
+    st.header("Your Information")
+    agents = st.number_input("Number of People", min_value=0, value=10, step=1)
+    human_rate = st.number_input("Pay Per Hour ($)", min_value=0.0, value=20.0, step=0.01)
+    burden_pct = st.slider("Extra Cost for Benefits (%)", 0, 100, 30)
+    hours_per_month = st.number_input("Hours Worked Each Month", min_value=0.0, value=160.0, step=0.1)
+    talk_pct = st.slider("Percent of Time Helping Customers (%)", 0, 100, 50)
 
-    st.markdown(f"""
-    <div class='banner'>
-      <h2>You’ll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
-      <p>For every $1 you spend on AI, you get {banner_ret} back.</p>
-      <p>You’ll get your setup money back in {banner_pay} months.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ─── Page Setup & Styles ───────────────────────────────
-if STREAMLIT_AVAILABLE:
-    brand_title = st.sidebar.text_input("App Title", value="AI Savings Calculator")
-    brand_icon = st.sidebar.text_input("App Icon (emoji)", value="💰")
-    st.set_page_config(page_title=brand_title, layout="wide", page_icon=brand_icon)
-    st.markdown("""
-    <style>
-      .banner { background-color: #E0F7FA; padding: 20px; border-radius: 10px; text-align: center; }
-      .result-card { background-color: #F1F8E9; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-      .tooltip { cursor: help; color: #0288D1; margin-left: 5px; }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # ─── Example Story ─────────────────────────────────
-    st.markdown("""
-    > **Meet Alex.** Alex has 10 people who each work 160 hours a month at $20/hour. By letting AI help with 40% of the work,
-    > Alex keeps an extra $8,000 each month and gets the $10,000 setup fee back in just 3 months!
-    """)
-    st.markdown("---")
-
-    # ─── Inputs & Results Layout ─────────────────────────────
-    input_col, result_col = st.columns([1, 1])
-    with input_col:
-        st.header("Your Information")
-        agents = st.number_input("Number of People", min_value=1, value=10, step=1)
-        human_rate = st.number_input("Pay Per Hour", min_value=1.0, value=20.0, step=1.0)
-        burden_pct = st.slider("Extra Cost for Benefits (%)", 0, 100, 30, step=5)
-        hours_per_month = st.number_input("Hours Worked Each Month", min_value=1.0, value=160.0, step=1.0)
-        talk_pct = st.slider("Percent of Time Helping Customers", 0, 100, 50, step=5)
-
-        st.subheader("AI Costs")
-        subscription = st.number_input("Monthly AI Fee ($)", min_value=0.0, value=1000.0, step=50.0)
-        ai_cost_min = st.number_input("AI Talk Cost (per min)", min_value=0.01, value=0.20, step=0.01)
-        automation_pct = st.slider("Goal: How Much AI Will Help (%)", 0, 100, 40, step=5)
-        integration_fee = st.number_input("One-Time Setup Cost ($)", min_value=0.0, value=10000.0, step=500.0)
-
-        include_indirect = st.checkbox("Include Extra Savings (fewer mistakes, happier staff)", value=True)
-        hr_pct = st.slider("Extra Savings: What percent to count?", 0, 100, 10, step=5) if include_indirect else 0
-
-    with result_col:
-        st.header("Your Results")
-        metrics = calculate_metrics(
-            agents=agents,
-            human_rate=human_rate,
-            burden_pct=burden_pct,
-            talk_pct=talk_pct,
-            hours_per_month=hours_per_month,
-            subscription=subscription,
-            automation_pct=automation_pct,
-            integration_fee=integration_fee,
-            include_indirect=include_indirect,
-            hr_pct=hr_pct,
-        )
-
-        # Render banner via helper
-        render_banner(metrics)
-
-        # Detailed cards
-        for label, key, tooltip in [
-            ("Money You Keep Each Month", 'net_savings',
-             "This is how much extra cash stays in your bank every month."),
-            ("Return per Dollar", 'return_per_dollar',
-             "For every dollar you pay AI, you get this many dollars back in savings."),
-            ("Months to Pay Back Setup", 'payback_mo_integ',
-             "How many months until your one-time fee is earned back."),
-        ]:
-            value = metrics.get(key, float('nan'))
-            display = f"{value:,.2f}" if isinstance(value, float) and math.isfinite(value) else (f"{int(value):,}" if isinstance(value, (int, float)) and math.isfinite(value) else "N/A")
-            st.markdown(f"""
-            <div class='result-card'>
-              <b>{label}</b> <span class='tooltip' title='{tooltip}'>ℹ️</span><br>
-              <span style='font-size:24px;'>{display}</span>
-            </div>
-            """, unsafe_allow_html=True)
-
-# ─── Unit Tests ─────────────────────────────────────
-if not os.getenv('STREAMLIT_RUN'):
-    def _almost_equal(a, b, tol=1e-6): return abs((a or 0) - (b or 0)) < tol
-    # Test case 1: default scenario
-    test_inputs = dict(
-        agents=10,
-        human_rate=20.0,
-        burden_pct=30,
-        talk_pct=50,
-        hours_per_month=160.0,
-        subscription=1000.0,
-        automation_pct=40,
-        integration_fee=10000.0,
-        include_indirect=True,
-        hr_pct=10,
+    st.header("AI Costs")
+    subscription = st.number_input("Monthly AI Fee ($)", min_value=0.0, value=1000.0, step=0.01)
+    ai_cost_min = st.number_input("AI Talk Cost (per min $)", min_value=0.0, value=0.20, step=0.01)
+    ai_speed = st.number_input(
+        "AI Speed Factor (times faster AI works than a person)",
+        min_value=0.1, value=2.0, step=0.1
     )
-    expected = calculate_metrics(**test_inputs)
-    got = calculate_metrics(**test_inputs)
-    assert set(got.keys()) == set(expected.keys()), "Mismatch in metric keys"
-    for k in expected:
-        assert _almost_equal(got[k], expected[k]), f"Metric {k} - expected {expected[k]}, got {got[k]}"
+    automation_pct = st.slider("Goal: How Much AI Will Help (%)", 0, 100, 40)
+    integration_fee = st.number_input("One-Time Setup Cost ($)", min_value=0.0, value=10000.0, step=1.0)
 
-    # Test case 2: no indirect savings
-    test_inputs2 = test_inputs.copy()
-    test_inputs2.update({'include_indirect': False, 'hr_pct': 0})
-    expected2 = calculate_metrics(**test_inputs2)
-    got2 = calculate_metrics(**test_inputs2)
-    assert got2['indirect_savings'] == 0.0 and got2['strategic_savings'] == 0.0
+    include_indirect = st.checkbox("Include Extra Savings (fewer mistakes, happier staff)", value=True)
+    hr_pct = st.slider("Extra Savings Percent (%)", 0, 100, 10) if include_indirect else 0
 
-    # Test case 3: zero baseline (agents=0)
-    test_inputs3 = test_inputs.copy()
-    test_inputs3.update({'agents': 0})
-    got3 = calculate_metrics(**test_inputs3)
-    assert math.isnan(got3['monthly_cost_efficiency'])
+# Calculate metrics
+net_savings, return_per_dollar, payback_months = calculate_metrics(
+    agents, human_rate, burden_pct, talk_pct, hours_per_month,
+    subscription, ai_cost_min, ai_speed, automation_pct,
+    integration_fee, include_indirect, hr_pct
+)
 
-    print("All unit tests passed!")
+# Display banner
+banner_html = f"""
+<div style='background-color: #E0F7FA; padding: 20px; border-radius: 10px; text-align: center;'>
+  <h2>You’ll save <span style='color:#2E7D32;'>${net_savings:,.0f}</span> each month!</h2>
+  <p>For every $1 you spend on AI, you get {return_per_dollar:,.2f} back.</p>
+  <p>You’ll get your setup fee back in {('N/A' if payback_months==float('inf') else f"{payback_months:,.1f}")} months.</p>
+</div>
+"""
+result_col.markdown(banner_html, unsafe_allow_html=True)
+
+# Display key results in metrics
+metrics_col1, metrics_col2, metrics_col3 = result_col.columns(3)
+metrics_col1.metric("Money You Keep Each Month", f"${net_savings:,.0f}")
+metrics_col2.metric("Return per Dollar", f"{return_per_dollar:,.2f}")
+payback_display = "N/A" if payback_months==float('inf') else f"{payback_months:,.1f} mo"
+metrics_col3.metric("Months to Pay Back Setup", payback_display)
