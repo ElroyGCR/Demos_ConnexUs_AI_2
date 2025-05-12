@@ -273,9 +273,7 @@ with i3:
 ai_spend = subscription + ai_variable_cost
 dollar_return = value_basis / ai_spend if ai_spend else 0.0
 
-# Cap the dollar return for realism (nobody gets more than $5 back per $1 invested)
-if dollar_return > 5.0:
-    dollar_return = 5.0
+# Removed cap on dollar return to show actual calculated values for large FTE counts
 
 st.markdown(f"""
 <div style='
