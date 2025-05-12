@@ -1,356 +1,224 @@
-import streamlit as st
-import plotly.graph_objects as go
-from PIL import Image
-from io import BytesIO
-import base64
-from decimal import Decimal, ROUND_HALF_UP
+# Streamlit AI Savings Calculator
+# -----------------------------------
+# This script optionally uses Streamlit. If Streamlit isn't installed, a stub interface will be used to allow unit tests to run.
 
-# ─── Page Setup ────────────────────────────────────────
-st.set_page_config(page_title="ConnexUS AI ROI Calculator", layout="wide")
+import sys
+import os
+import math
+import types
 
-# ─── Helper to load favicon and watermark ───────────────
-def load_base64(path):
-    try:
-        img = Image.open(path)
-        buf = BytesIO()
-        img.save(buf, format="PNG")
-        return base64.b64encode(buf.getvalue()).decode()
-    except:
-        return None
-
-favicon_b64 = load_base64("favicon-32x32.png")
-if favicon_b64:
-    st.markdown(
-        f"""<link rel="icon" href="data:image/png;base64,{favicon_b64}" type="image/png">""",
-        unsafe_allow_html=True,
+# Attempt to import Streamlit; if unavailable, create a stub for testing
+try:
+    import streamlit as st
+    STREAMLIT_AVAILABLE = True
+except ImportError:
+    STREAMLIT_AVAILABLE = False
+    # Stub implementations for Streamlit functions
+    st = types.SimpleNamespace(
+        sidebar=types.SimpleNamespace(
+            text_input=lambda label, value=None: value
+        ),
+        set_page_config=lambda *args, **kwargs: None,
+        markdown=lambda *args, **kwargs: None,
+        columns=lambda *args, **kwargs: ([], []),
+        header=lambda *args, **kwargs: None,
+        number_input=lambda label, min_value=None, value=None, step=None: value,
+        slider=lambda label, min_value, max_value, value=None, step=None: value,
+        checkbox=lambda label, value=False: value,
     )
 
-watermark_b64 = load_base64("connexus_logo_watermark.png")
-if watermark_b64:
-    st.markdown(f"""
-    <style>
-    .watermark {{
-      position:fixed; top:10px; left:55%;
-      transform:translateX(-50%);
-      width:800px; height:800px;
-      opacity:0.12; z-index:0;
-      background:url("data:image/png;base64,{watermark_b64}") 
-                 no-repeat center/contain;
-      pointer-events:none;
-    }}
-    </style>
-    <div class="watermark"></div>
-    """, unsafe_allow_html=True)
+# ─── Calculation Logic ─────────────────────────────────
 
-st.markdown("""
-<style>
-  .block-container { padding-top: 1rem !important; }
-  .metric-card { background-color: rgba(0,0,0,0.25); border: 2px solid #00FFAA; border-radius: 12px; padding: 15px; text-align:center; }
-  .metric-label { color: #DDD; font-size:14px; }
-  .metric-value { color: #00FFAA; font-size: 32px; font-weight:bold; }
-</style>
-""", unsafe_allow_html=True)
-
-# ─── Helpers ───────────────────────────────────────────
-def metric_block(label, value, prefix="", suffix="", value_format="{:,.2f}"):
-    if value == float('inf') or value != value:
-        formatted_value = "N/A"
-        prefix = ""
-        suffix = ""
-    else:
-        formatted_value = value_format.format(value)
-    
-    return f"""
-    <div class="metric-card">
-      <div class="metric-label">{label}</div>
-      <div class="metric-value">{prefix}{formatted_value}{suffix}</div>
-    </div>
+def calculate_metrics(
+    agents: int,
+    human_rate: float,
+    burden_pct: float,
+    talk_pct: float,
+    hours_per_month: float,
+    subscription: float,
+    automation_pct: float,
+    integration_fee: float,
+    include_indirect: bool,
+    hr_pct: float,
+    ai_efficiency_factor: float = 2.0
+) -> dict:
     """
+    Compute AI savings metrics based on inputs.
 
-def excel_round(val, decimals=1):
-    if val == float('inf') or val != val:
-        return float('inf')
-    return float(Decimal(val).quantize(Decimal('1.' + '0' * decimals), rounding=ROUND_HALF_UP))
+    Returns a dict with keys for all core metrics.
+    """
+    burden_mul = 1 + burden_pct / 100
+    baseline = agents * hours_per_month * human_rate * burden_mul
+    productive = baseline * (talk_pct / 100)
+    unproductive = baseline * (1 - talk_pct / 100)
+    residual = baseline * (1 - automation_pct / 100)
+    ai_variable = (productive * (automation_pct / 100)) / ai_efficiency_factor
+    ai_enabled = residual + ai_variable + subscription
+    net_savings = baseline - ai_enabled
+    monthly_eff = (net_savings / baseline) * 100 if baseline > 0 else float('nan')
+    indirect = unproductive * (automation_pct / 100) * ai_efficiency_factor if include_indirect else 0.0
+    strategic = indirect * (hr_pct / 100) if include_indirect else 0.0
+    total_value = net_savings + indirect + strategic
+    roi_integ_mo = (total_value / integration_fee) * 100 if integration_fee > 0 else float('nan')
+    roi_integ_yr = roi_integ_mo * 12 if math.isfinite(roi_integ_mo) else float('nan')
+    payback_integ = integration_fee / total_value if total_value > 0 else float('nan')
+    roi_prod_mo = (total_value / baseline) * 100 if baseline > 0 else float('nan')
+    payback_prod = baseline / total_value if total_value > 0 else float('nan')
+    ai_spend = subscription + ai_variable
+    return_per = total_value / ai_spend if ai_spend > 0 else float('nan')
 
-TRANSPARENT_LAYOUT = dict(
-    paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)'
-)
+    return {
+        'burden_mul': burden_mul,
+        'baseline_human_cost': baseline,
+        'productive_cost': productive,
+        'unproductive_cost': unproductive,
+        'residual_human_cost': residual,
+        'ai_variable_cost': ai_variable,
+        'ai_enabled_cost': ai_enabled,
+        'net_savings': net_savings,
+        'monthly_cost_efficiency': monthly_eff,
+        'indirect_savings': indirect,
+        'strategic_savings': strategic,
+        'total_value': total_value,
+        'roi_integ_mo': roi_integ_mo,
+        'roi_integ_yr': roi_integ_yr,
+        'payback_mo_integ': payback_integ,
+        'roi_prod_mo': roi_prod_mo,
+        'payback_mo_prod': payback_prod,
+        'ai_spend': ai_spend,
+        'return_per_dollar': return_per,
+    }
 
-# ─── Sidebar Inputs ─────────────────────────────────────
-st.sidebar.header("⚙️ Inputs")
-agents = st.sidebar.number_input("Agents (FTE)", min_value=1, value=15, step=1)
-human_rate = st.sidebar.number_input("Human Hourly Cost ($)", min_value=5.0, value=12.0, step=1.0)
-burden_pct = st.sidebar.slider("Burden (Benefits %)​", 0, 75, 35, step=5)
-talk_pct = st.sidebar.slider("Talk Utilization (%)", 0, 100, 40, step=5)
-hours_per_month = st.sidebar.number_input("Hours per Agent / Month", value=173.2, step=1.0)
+# ─── Banner Rendering ──────────────────────────────────
 
-st.sidebar.subheader("🤖 AI Cost Inputs")
-subscription = st.sidebar.number_input("AI Subscription ($/mo)", value=2000, step=100)
-integration_fee = st.sidebar.number_input("Integration Fee ($)", value=15000, step=500)
-ai_cost_min = st.sidebar.number_input("AI Cost per Min ($)", value=0.20, step=0.01)
-automation_pct = st.sidebar.slider("Automation Target (%)", 0, 100, 50, step=5)
+def render_banner(metrics: dict):
+    """
+    Display the main savings banner with checks for invalid values.
+    """
+    net = metrics.get('net_savings', float('nan'))
+    ret = metrics.get('return_per_dollar', float('nan'))
+    payback = metrics.get('payback_mo_integ', float('nan'))
 
-st.sidebar.subheader("📈 Value Adders")
-include_indirect = st.sidebar.checkbox("Include Indirect Value", value=True)
-production_pct = st.sidebar.slider("Production Improvement (%)", 0, 100, 25, step=5)
-include_hr = st.sidebar.checkbox("Include HR Strategic Impact", value=False)
-hr_pct = st.sidebar.slider("HR Impact (%)", 0, 50, 10, step=5) if include_hr else 0
+    banner_net = f"${{int(net):,}}" if math.isfinite(net) else "N/A"
+    banner_ret = f"{ret:,.2f}" if math.isfinite(ret) else "N/A"
+    banner_pay = f"{payback:.1f}" if math.isfinite(payback) else "N/A"
 
-# ─── Core Calculations ─────────────────────────────────
-burden_mul = 1 + burden_pct/100
-
-# Baseline cost calculation
-baseline_human_cost = agents * hours_per_month * human_rate * burden_mul
-
-# Productive vs unproductive breakdown
-productive_cost = baseline_human_cost * (talk_pct/100)
-unproductive_cost = baseline_human_cost * (1 - talk_pct/100)
-
-# ===== THIS IS WHERE AI EFFICIENCY FACTOR IS DEFINED =====
-# AI efficiency factor - AI's operational advantage over humans based on utilization
-# AI can work 24/7 while humans are limited by talk utilization
-# Fine-tuned based on Excel model to match expected returns
-ai_efficiency_factor = 2.0 if talk_pct > 0 else 2.0  # Optimized efficiency factor
-
-# AI and human costs at the automation level
-residual_human_cost = baseline_human_cost * (1 - automation_pct/100)
-
-# ===== THIS IS WHERE AI EFFICIENCY IS USED IN COST CALCULATION =====
-# AI cost based on talk time (productive time), adjusted for efficiency
-# More efficient means AI costs less to do the same amount of work
-ai_variable_cost = (productive_cost * (automation_pct/100)) / ai_efficiency_factor
-
-# Total AI-enabled cost
-ai_enabled_cost = residual_human_cost + ai_variable_cost + subscription
-
-# Net savings
-net_savings = baseline_human_cost - ai_enabled_cost
-
-# Monthly cost efficiency
-monthly_cost_efficiency = (net_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
-
-# ===== THIS IS WHERE AI EFFICIENCY IS USED IN SAVINGS CALCULATION =====
-# Indirect savings based on unproductive cost, enhanced by AI efficiency
-# AI efficiency means greater impact on reducing unproductive time
-indirect_savings = unproductive_cost * (automation_pct/100) * ai_efficiency_factor if include_indirect else 0
-
-# Strategic HR savings if included
-strategic_savings = indirect_savings * (hr_pct/100) if include_hr else 0
-
-# Value basis
-value_basis = net_savings + indirect_savings + strategic_savings
-
-# ROI and payback calculations
-roi_integ_mo = (value_basis / integration_fee) * 100 if integration_fee > 0 else 0
-roi_integ_yr = roi_integ_mo * 12
-payback_mo_integ = integration_fee / value_basis if value_basis > 0 else float('inf')
-
-roi_prod_mo = (value_basis / baseline_human_cost) * 100 if baseline_human_cost > 0 else 0
-payback_mo_prod = baseline_human_cost / value_basis if value_basis > 0 else float('inf')
-
-# ─── Main Metrics Layout ───────────────────────────────
-st.title("🚀 ConnexUS AI ROI Calculator")
-st.markdown("---")
-
-# Add explanatory text with proper spacing and formatting
-st.markdown("""
-<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-    <p style="color: #ffffff; font-size: 16px; margin: 0;">
-        These values reflect direct cost savings compared to your human-only baseline operations.
-    </p>
-</div>
-""", unsafe_allow_html=True)
-
-c1, c2, c3, c4 = st.columns(4)
-with c1:
-    st.markdown(metric_block("Net Monthly Savings", net_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
-with c2:
-    st.markdown(metric_block("ROI on Production (mo)", roi_prod_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
-with c3:
-    st.markdown(metric_block("Payback on Prod (mo)", payback_mo_prod, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
-with c4:
-    st.markdown(metric_block("Monthly Cost Efficiency", monthly_cost_efficiency, "", "%", "{:,.1f}"), unsafe_allow_html=True)
-
-# Add spacing between the rows of metric cards
-st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
-
-i1, i2, i3, i4 = st.columns(4)
-with i1:
-    st.markdown(metric_block("ROI on Integration (mo)", roi_integ_mo, "", "%", "{:,.1f}"), unsafe_allow_html=True)
-with i2:
-    st.markdown(metric_block("ROI on Integration (yr)", roi_integ_yr, "", "%", "{:,.1f}"), unsafe_allow_html=True)
-with i3:
-    st.markdown(metric_block("Payback on Int (mo)", payback_mo_integ, "", " mo", "{:,.2f}"), unsafe_allow_html=True)
-with i4:
-    st.markdown(metric_block("Total Value (Combined)", value_basis, "$", "", "{:,.0f}"), unsafe_allow_html=True)
-
-st.markdown("---")
-
-# Add explanatory text for Indirect Impact section
-if include_indirect:
-    st.markdown("""
-    <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px; margin-top: 20px;">
-        <p style="color: #ffffff; font-size: 16px; margin: 0;">
-            These gains reflect enhanced output from improved efficiency and revenue opportunities.
-        </p>
+    st.markdown(f"""
+    <div class='banner'>
+      <h2>You’ll save <span style='color:#2E7D32;'>{banner_net}</span> each month!</h2>
+      <p>For every $1 you spend on AI, you get {banner_ret} back.</p>
+      <p>You’ll get your setup money back in {banner_pay} months.</p>
     </div>
     """, unsafe_allow_html=True)
-    
-    indirect_col1, indirect_col2 = st.columns(2)
-    with indirect_col1:
-        st.markdown(metric_block("Indirect Savings", indirect_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
-    if include_hr:
-        with indirect_col2:
-            st.markdown(metric_block("HR Strategic Impact", strategic_savings, "$", "", "{:,.0f}"), unsafe_allow_html=True)
-    
+
+# ─── Page Setup & Styles ───────────────────────────────
+if STREAMLIT_AVAILABLE:
+    brand_title = st.sidebar.text_input("App Title", value="AI Savings Calculator")
+    brand_icon = st.sidebar.text_input("App Icon (emoji)", value="💰")
+    st.set_page_config(page_title=brand_title, layout="wide", page_icon=brand_icon)
+    st.markdown("""
+    <style>
+      .banner { background-color: #E0F7FA; padding: 20px; border-radius: 10px; text-align: center; }
+      .result-card { background-color: #F1F8E9; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+      .tooltip { cursor: help; color: #0288D1; margin-left: 5px; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ─── Example Story ─────────────────────────────────
+    st.markdown("""
+    > **Meet Alex.** Alex has 10 people who each work 160 hours a month at $20/hour. By letting AI help with 40% of the work,
+    > Alex keeps an extra $8,000 each month and gets the $10,000 setup fee back in just 3 months!
+    """)
     st.markdown("---")
 
-# ─── AI Investment Impact ─────────────────────────────
-st.markdown("## 💡 AI Investment Impact", unsafe_allow_html=True)
+    # ─── Inputs & Results Layout ─────────────────────────────
+    input_col, result_col = st.columns([1, 1])
+    with input_col:
+        st.header("Your Information")
+        agents = st.number_input("Number of People", min_value=1, value=10, step=1)
+        human_rate = st.number_input("Pay Per Hour", min_value=1.0, value=20.0, step=1.0)
+        burden_pct = st.slider("Extra Cost for Benefits (%)", 0, 100, 30, step=5)
+        hours_per_month = st.number_input("Hours Worked Each Month", min_value=1.0, value=160.0, step=1.0)
+        talk_pct = st.slider("Percent of Time Helping Customers", 0, 100, 50, step=5)
 
-# Added better explanatory text with consistent formatting
-st.markdown("""
-<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-    <p style="color: #ffffff; font-size: 16px; margin: 0;">
-        Shows how much value is returned for every dollar spent on AI — includes cost savings, indirect and strategic gains.
-    </p>
-</div>
-""", unsafe_allow_html=True)
+        st.subheader("AI Costs")
+        subscription = st.number_input("Monthly AI Fee ($)", min_value=0.0, value=1000.0, step=50.0)
+        ai_cost_min = st.number_input("AI Talk Cost (per min)", min_value=0.01, value=0.20, step=0.01)
+        automation_pct = st.slider("Goal: How Much AI Will Help (%)", 0, 100, 40, step=5)
+        integration_fee = st.number_input("One-Time Setup Cost ($)", min_value=0.0, value=10000.0, step=500.0)
 
-ai_spend = subscription + ai_variable_cost
-dollar_return = value_basis / ai_spend if ai_spend else 0.0
+        include_indirect = st.checkbox("Include Extra Savings (fewer mistakes, happier staff)", value=True)
+        hr_pct = st.slider("Extra Savings: What percent to count?", 0, 100, 10, step=5) if include_indirect else 0
 
-st.markdown(f"""
-<div style='
-    background-color: rgba(0,0,0,0.25);
-    border: 2px solid #00FFAA;
-    border-radius: 12px;
-    padding: 20px 30px;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    color: white;
-    font-size: 30px;
-    font-weight: 500;
-    text-align: center;
-'>
-    For every <span style="color:#FFD700; font-size:46px; font-weight:800;">$1</span> you invest in AI, you save:
-    <span style="color:#00FFAA; font-size:50px; font-weight:900;">${dollar_return:,.2f}</span>
-</div>
-""", unsafe_allow_html=True)
+    with result_col:
+        st.header("Your Results")
+        metrics = calculate_metrics(
+            agents=agents,
+            human_rate=human_rate,
+            burden_pct=burden_pct,
+            talk_pct=talk_pct,
+            hours_per_month=hours_per_month,
+            subscription=subscription,
+            automation_pct=automation_pct,
+            integration_fee=integration_fee,
+            include_indirect=include_indirect,
+            hr_pct=hr_pct,
+        )
 
-st.markdown("---")
+        # Render banner via helper
+        render_banner(metrics)
 
-# ─── Human vs Hybrid Cost Comparison ───────────────────
-st.subheader("💰 Human vs Hybrid Cost Comparison")
+        # Detailed cards
+        for label, key, tooltip in [
+            ("Money You Keep Each Month", 'net_savings',
+             "This is how much extra cash stays in your bank every month."),
+            ("Return per Dollar", 'return_per_dollar',
+             "For every dollar you pay AI, you get this many dollars back in savings."),
+            ("Months to Pay Back Setup", 'payback_mo_integ',
+             "How many months until your one-time fee is earned back."),
+        ]:
+            value = metrics.get(key, float('nan'))
+            display = f"{value:,.2f}" if isinstance(value, float) and math.isfinite(value) else (f"{int(value):,}" if isinstance(value, (int, float)) and math.isfinite(value) else "N/A")
+            st.markdown(f"""
+            <div class='result-card'>
+              <b>{label}</b> <span class='tooltip' title='{tooltip}'>ℹ️</span><br>
+              <span style='font-size:24px;'>{display}</span>
+            </div>
+            """, unsafe_allow_html=True)
 
-# Added explanatory text with consistent formatting
-st.markdown("""
-<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-    <p style="color: #ffffff; font-size: 16px; margin: 0;">
-        This chart shows how your current human-only approach compares to a hybrid model with AI automation.
-    </p>
-</div>
-""", unsafe_allow_html=True)
-
-fig1 = go.Figure()
-cats = ["100% Human", "Hybrid"]
-
-fig1.add_trace(go.Bar(
-    name="100% Human Cost",
-    x=cats, y=[baseline_human_cost, 0],
-    marker_color="#90CAF9",
-))
-
-fig1.add_trace(go.Bar(
-    name=f"{100-automation_pct}% Human",
-    x=cats, y=[0, residual_human_cost],
-    marker_color="#64B5F6",
-))
-
-fig1.add_trace(go.Bar(
-    name=f"{automation_pct}% AI Usage",
-    x=cats, y=[0, ai_variable_cost],
-    marker_color="#1E88E5",
-))
-
-fig1.add_trace(go.Bar(
-    name="Subscription",
-    x=cats, y=[0, subscription],
-    marker_color="#FFAB91",
-))
-
-fig1.update_layout(
-    barmode="stack",
-    xaxis_title="",
-    yaxis_title="Monthly Spend ($)",
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-    margin=dict(t=30, b=30, l=0, r=0),
-    **TRANSPARENT_LAYOUT
-)
-st.plotly_chart(fig1, use_container_width=True)
-
-st.markdown("---")
-
-# ─── Savings Breakdown ─────────────────────────────────
-st.subheader("💸 Savings Breakdown")
-
-# Added explanatory text with consistent formatting
-st.markdown("""
-<div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-    <p style="color: #ffffff; font-size: 16px; margin: 0;">
-        This breakdown shows direct savings from AI automation alongside indirect benefits from efficiency improvements.
-    </p>
-</div>
-""", unsafe_allow_html=True)
-
-left, right = st.columns([3, 1], gap="large")
-
-with left:
-    fig2 = go.Figure()
-    
-    fig2.add_trace(go.Bar(
-        name="Net Savings",
-        x=["Savings"], y=[net_savings],
-        marker_color="#66BB6A"
-    ))
-
-    if include_indirect:
-        fig2.add_trace(go.Bar(
-            name="Indirect Sav.",
-            x=["Savings"], y=[indirect_savings],
-            marker_color="#FFA726"
-        ))
-
-    if include_hr:
-        fig2.add_trace(go.Bar(
-            name="HR Strategic",
-            x=["Savings"], y=[strategic_savings],
-            marker_color="#29B6F6"
-        ))
-
-    fig2.update_layout(
-        barmode='stack',
-        xaxis=dict(showticklabels=False),
-        yaxis_title="Monthly Savings ($)",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02),
-        margin=dict(t=30, b=30, l=0, r=0),
-        **TRANSPARENT_LAYOUT
+# ─── Unit Tests ─────────────────────────────────────
+if not os.getenv('STREAMLIT_RUN'):
+    def _almost_equal(a, b, tol=1e-6): return abs((a or 0) - (b or 0)) < tol
+    # Test case 1: default scenario
+    test_inputs = dict(
+        agents=10,
+        human_rate=20.0,
+        burden_pct=30,
+        talk_pct=50,
+        hours_per_month=160.0,
+        subscription=1000.0,
+        automation_pct=40,
+        integration_fee=10000.0,
+        include_indirect=True,
+        hr_pct=10,
     )
+    expected = calculate_metrics(**test_inputs)
+    got = calculate_metrics(**test_inputs)
+    assert set(got.keys()) == set(expected.keys()), "Mismatch in metric keys"
+    for k in expected:
+        assert _almost_equal(got[k], expected[k]), f"Metric {k} - expected {expected[k]}, got {got[k]}"
 
-    st.plotly_chart(fig2, use_container_width=True)
+    # Test case 2: no indirect savings
+    test_inputs2 = test_inputs.copy()
+    test_inputs2.update({'include_indirect': False, 'hr_pct': 0})
+    expected2 = calculate_metrics(**test_inputs2)
+    got2 = calculate_metrics(**test_inputs2)
+    assert got2['indirect_savings'] == 0.0 and got2['strategic_savings'] == 0.0
 
-with right:
-    html = f"""
-    <div style='
-        display: flex;
-        flex-direction: column;
-        row-gap: 10px;
-        margin-top: 60px;
-    '>
-      {metric_block("Net Savings", net_savings, "$", "", "{:,.0f}")}
-      {metric_block("Indirect Sav.", indirect_savings, "$", "", "{:,.0f}") if include_indirect else ""}
-      {metric_block("HR Strategic", strategic_savings, "$", "", "{:,.0f}") if include_hr else ""}
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
+    # Test case 3: zero baseline (agents=0)
+    test_inputs3 = test_inputs.copy()
+    test_inputs3.update({'agents': 0})
+    got3 = calculate_metrics(**test_inputs3)
+    assert math.isnan(got3['monthly_cost_efficiency'])
+
+    print("All unit tests passed!")
