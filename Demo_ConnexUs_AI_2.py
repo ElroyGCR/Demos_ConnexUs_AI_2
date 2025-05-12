@@ -5,6 +5,7 @@ from io import BytesIO
 import base64
 from decimal import Decimal, ROUND_HALF_UP
 import os
+import math
 
 # ─── Page Setup ────────────────────────────────────────
 st.set_page_config(page_title="ConnexUS AI ROI Calculator", layout="wide", page_icon=None)
@@ -101,6 +102,14 @@ def excel_round(val, decimals=1):
         return float('inf')
     return float(Decimal(val).quantize(Decimal('1.' + '0' * decimals), rounding=ROUND_HALF_UP))
 
+# Helper to apply a logarithmic scaling factor to prevent unrealistic results
+def log_scale_factor(value, base=10, min_factor=0.05, max_factor=0.25):
+    if value <= 0:
+        return min_factor
+    # Apply logarithmic scaling that decreases as value increases
+    factor = max_factor - (math.log(value, base) / 20)
+    return max(min_factor, min(factor, max_factor))  # Clamp between min and max
+
 TRANSPARENT_LAYOUT = dict(
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)'
@@ -131,6 +140,10 @@ burden_mul = 1 + burden_pct/100
 
 # Baseline cost calculation
 baseline_human_cost = agents * hours_per_month * human_rate * burden_mul
+
+# Apply scaling factors based on the total baseline cost
+# This ensures that we get reasonable ROI numbers even with extremely large inputs
+scaling_factor = log_scale_factor(baseline_human_cost, base=10)
 
 # Productive vs unproductive breakdown
 productive_cost = baseline_human_cost * (talk_pct/100)
@@ -163,16 +176,17 @@ if hourly_utilization_advantage < 0:  # Cap at 0 to avoid negative advantage
 
 # Apply this advantage to the productive hours automated
 ai_productive_hours = ai_minutes / 60
-utilization_savings = hourly_utilization_advantage * ai_productive_hours * 0.15  # Apply a conservative factor
+utilization_savings = hourly_utilization_advantage * ai_productive_hours * scaling_factor
 
-# Net savings (renamed to Direct savings in the UI)
-direct_savings = baseline_human_cost - ai_enabled_cost
+# Apply scaling factor to ensure reasonable results with large agent counts
+direct_savings_raw = baseline_human_cost - ai_enabled_cost
+direct_savings = direct_savings_raw * scaling_factor
 
 # Monthly cost efficiency
 monthly_cost_efficiency = (direct_savings / baseline_human_cost) * 100 if baseline_human_cost > 0 else float('inf')
 
 # Indirect savings based on unproductive cost
-indirect_savings = unproductive_cost * (automation_pct/100) * 0.25 if include_indirect else 0  # Apply a conservative factor
+indirect_savings = unproductive_cost * (automation_pct/100) * scaling_factor if include_indirect else 0
 
 # Strategic HR savings if included
 strategic_savings = indirect_savings * (hr_pct/100) if include_hr else 0
@@ -180,10 +194,26 @@ strategic_savings = indirect_savings * (hr_pct/100) if include_hr else 0
 # Value basis (including utilization savings)
 value_basis = direct_savings + utilization_savings + indirect_savings + strategic_savings
 
+# Cap the value basis relative to baseline cost to ensure realistic results
+max_value_basis = baseline_human_cost * 0.5  # Cap at 50% of baseline cost
+if value_basis > max_value_basis:
+    value_basis = max_value_basis
+
 # ROI and payback calculations
 roi_integ_mo = (value_basis / integration_fee) * 100 if integration_fee > 0 else 0
 roi_integ_yr = roi_integ_mo * 12
+
+# Cap ROI at reasonable limits
+max_roi_yr = 1000  # 1000% annual ROI cap
+if roi_integ_yr > max_roi_yr:
+    roi_integ_yr = max_roi_yr
+    roi_integ_mo = max_roi_yr / 12
+
 payback_mo_integ = integration_fee / value_basis if value_basis > 0 else float('inf')
+
+# Minimum payback period of 0.5 months (about 2 weeks) for realism
+if payback_mo_integ < 0.5:
+    payback_mo_integ = 0.5
 
 roi_prod_mo = (value_basis / baseline_human_cost) * 100 if baseline_human_cost > 0 else 0
 payback_mo_prod = baseline_human_cost / value_basis if value_basis > 0 else float('inf')
@@ -232,6 +262,10 @@ with i3:
 # AI Investment Return Display
 ai_spend = subscription + ai_variable_cost
 dollar_return = value_basis / ai_spend if ai_spend else 0.0
+
+# Cap the dollar return for realism (nobody gets more than $5 back per $1 invested)
+if dollar_return > 5.0:
+    dollar_return = 5.0
 
 st.markdown(f"""
 <div style='
